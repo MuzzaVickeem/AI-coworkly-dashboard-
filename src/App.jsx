@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { LocationProvider } from '@/context/LocationContext';
 import { DataProvider } from '@/context/DataContext';
+import { BookingProvider } from '@/context/BookingContext';
 import { Layout } from '@/components/layout/Layout';
 import { Login } from '@/pages/Login';
 import { CompanySelection } from '@/pages/CompanySelection';
@@ -56,7 +57,9 @@ function AppRoutes() {
           <ProtectedRoute>
             <LocationProvider>
               <DataProvider>
-                <CompanySelection />
+                <BookingProvider>
+                  <CompanySelection />
+                </BookingProvider>
               </DataProvider>
             </LocationProvider>
           </ProtectedRoute>
@@ -70,7 +73,9 @@ function AppRoutes() {
           <ProtectedRoute requireCompany>
             <LocationProvider>
               <DataProvider>
-                <Layout />
+                <BookingProvider>
+                  <Layout />
+                </BookingProvider>
               </DataProvider>
             </LocationProvider>
           </ProtectedRoute>

@@ -1,4 +1,4 @@
-// Mock location data for co-working spaces
+// Location data for co-working spaces
 export const locations = [
     {
         id: 'loc-a',
