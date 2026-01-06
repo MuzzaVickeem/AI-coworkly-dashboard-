@@ -2,21 +2,21 @@
 export const locations = [
     {
         id: 'loc-a',
-        name: 'Location A - Downtown',
-        totalSeats: 150,
-        address: '123 Business District, Downtown',
+        name: 'Ideassion Technology',
+        totalSeats: 65,
+        address: ' Hameed Complex, Anna Salai, Chennai, Tamil Nadu 600006',
     },
     {
         id: 'loc-b',
-        name: 'Location B - Tech Park',
-        totalSeats: 200,
-        address: '456 Innovation Hub, Tech Park',
+        name: 'IITT',
+        totalSeats: 13,
+        address: ' Anna Salai, Chennai, Tamil Nadu 600006',
     },
     {
         id: 'loc-c',
-        name: 'Location C - Suburban',
-        totalSeats: 100,
-        address: '789 Green Valley, Suburban',
+        name: 'LaunchPod',
+        totalSeats: 15,
+        address: ' Perungudi, Chennai, Tamil Nadu 600066',
     },
 ];
 

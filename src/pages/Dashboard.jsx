@@ -36,16 +36,28 @@ export function Dashboard() {
     if (!kpis) return null;
 
     return (
-        <div className="space-y-6">
+        <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
+            className="space-y-6"
+        >
             {/* Page Header */}
             <motion.div
                 key={`header-${animationKey}`}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.4 }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
             >
-                <h1 className="text-2xl font-bold text-white mb-1">Dashboard</h1>
-                <p className="text-neutral-400">{selectedLocation?.name}</p>
+                <div className="flex items-center justify-between">
+                    <div>
+                        <h1 className="text-3xl font-bold text-white mb-1">Operations Overview</h1>
+                        <p className="text-neutral-400">{selectedLocation?.name}</p>
+                    </div>
+                    <div className="text-sm text-neutral-500">
+                        Today: {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                    </div>
+                </div>
             </motion.div>
 
             {/* KPI Cards */}
@@ -55,33 +67,33 @@ export function Dashboard() {
                     className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
                 >
                     <KPICard
-                        title="Total Seats"
-                        value={kpis.totalSeats}
-                        icon={IconArmchair2}
+                        title="Total Tenants"
+                        value={kpis.tenantCount}
+                        icon={IconUsers}
                         color="blue"
                         delay={0}
                     />
                     <KPICard
-                        title="Occupied Seats"
-                        value={kpis.occupiedSeats}
-                        icon={IconArmchair}
-                        color="green"
-                        delay={0.1}
+                        title="Seat Occupancy"
+                        value={kpis.occupancyPercentage}
+                        suffix="%"
+                        icon={IconPercentage}
+                        color="purple"
+                        delay={0.08}
                     />
                     <KPICard
                         title="Vacant Seats"
                         value={kpis.vacantSeats}
                         icon={IconArmchair}
                         color="amber"
-                        delay={0.2}
+                        delay={0.16}
                     />
                     <KPICard
-                        title="Occupancy"
-                        value={kpis.occupancyPercentage}
-                        suffix="%"
-                        icon={IconPercentage}
-                        color="purple"
-                        delay={0.3}
+                        title="Staff Present Today"
+                        value={attendanceStats.present}
+                        icon={IconUsers}
+                        color="green"
+                        delay={0.24}
                     />
                 </motion.div>
             </AnimatePresence>
@@ -96,6 +108,6 @@ export function Dashboard() {
                 />
                 <TenantDistribution />
             </div>
-        </div>
+        </motion.div>
     );
 }
