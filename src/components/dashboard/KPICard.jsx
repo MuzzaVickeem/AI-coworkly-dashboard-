@@ -52,7 +52,7 @@ export function KPICard({
     color = 'blue',
     delay = 0,
 }) {
-    const animatedValue = useCountUp(value, 1200);
+    const animatedValue = useCountUp(value, 600);
 
     const colorClasses = {
         blue: 'from-blue-500/20 to-blue-600/5 border-blue-500/30',
@@ -81,13 +81,13 @@ export function KPICard({
             }}
             whileHover={{
                 y: -4,
-                transition: { duration: 0.2 },
+                transition: { duration: 0.2, ease: [0.25, 0.46, 0.45, 0.94] },
             }}
         >
             <Card
                 className={cn(
-                    'bg-gradient-to-br border backdrop-blur-sm transition-shadow duration-300',
-                    'hover:shadow-lg hover:shadow-black/20',
+                    'bg-gradient-to-br border backdrop-blur-sm transition-all duration-300',
+                    'hover:shadow-xl hover:shadow-black/25 hover:brightness-110',
                     colorClasses[color]
                 )}
             >

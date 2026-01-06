@@ -8,7 +8,14 @@ export const ROLES = {
 };
 
 export function AuthProvider({ children }) {
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [currentRole, setCurrentRole] = useState(ROLES.ADMIN);
+    const [selectedCompanyId, setSelectedCompanyId] = useState(null);
+    const [adminEmail, setAdminEmail] = useState('');
+    const [hasSeenIntro, setHasSeenIntro] = useState(() => {
+        // Check sessionStorage on mount
+        return sessionStorage.getItem('hasSeenIntro') === 'true';
+    });
 
     const isAdmin = currentRole === ROLES.ADMIN;
     const isDirector = currentRole === ROLES.DIRECTOR;
@@ -19,7 +26,45 @@ export function AuthProvider({ children }) {
         );
     };
 
+    const login = (email, role = ROLES.ADMIN) => {
+        setAdminEmail(email);
+        setCurrentRole(role);
+        setIsLoggedIn(true);
+    };
+
+    const logout = () => {
+        setIsLoggedIn(false);
+        setSelectedCompanyId(null);
+        setAdminEmail('');
+    };
+
+    const selectCompany = (companyId) => {
+        setSelectedCompanyId(companyId);
+    };
+
+    const clearCompanySelection = () => {
+        setSelectedCompanyId(null);
+    };
+
+    const markIntroSeen = () => {
+        setHasSeenIntro(true);
+        sessionStorage.setItem('hasSeenIntro', 'true');
+    };
+
     const value = {
+        // Login state
+        isLoggedIn,
+        adminEmail,
+        login,
+        logout,
+        // Company selection
+        selectedCompanyId,
+        selectCompany,
+        clearCompanySelection,
+        // Intro state
+        hasSeenIntro,
+        markIntroSeen,
+        // Role management
         currentRole,
         setCurrentRole,
         isAdmin,

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
+    IconHome,
     IconLayoutDashboard,
     IconUsers,
     IconArmchair2,
@@ -13,25 +14,26 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 const navItems = [
+
     {
         label: 'Dashboard',
         icon: IconLayoutDashboard,
-        path: '/',
+        path: '/dashboard',
     },
     {
         label: 'Tenants',
         icon: IconUsers,
-        path: '/tenants',
+        path: '/dashboard/tenants',
     },
     {
         label: 'Seats',
         icon: IconArmchair2,
-        path: '/seats',
+        path: '/dashboard/seats',
     },
     {
         label: 'Staff Attendance',
         icon: IconCalendarTime,
-        path: '/attendance',
+        path: '/dashboard/attendance',
     },
 ];
 

@@ -26,15 +26,15 @@ export function OccupancyGauge({ percentage }) {
         },
         legend: false,
         animate: {
-            enter: { type: 'waveIn', duration: 1000 },
+            enter: { type: 'waveIn', duration: 600 },
         },
     };
 
     return (
         <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.48, ease: [0.25, 0.46, 0.45, 0.94] }}
         >
             <Card className="bg-neutral-900/50 border-neutral-800">
                 <CardHeader className="pb-2">
