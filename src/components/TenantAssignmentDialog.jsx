@@ -120,7 +120,7 @@ export function TenantAssignmentDialog({ isOpen, onClose, onBack, bookingData, o
                         <Button
                             variant="ghost"
                             size="icon"
-                            className="h-8 w-8 text-slate-500 hover:text-slate-900 hover:bg-slate-100"
+                            className="h-8 w-8"
                             onClick={onBack}
                         >
                             <IconArrowLeft size={18} />
@@ -331,13 +331,13 @@ export function TenantAssignmentDialog({ isOpen, onClose, onBack, bookingData, o
                     <div className="flex justify-between gap-4 mt-6 pt-6 border-t border-slate-200">
                         <Button
                             variant="outline"
-                            className="h-11 px-6 border-slate-300 text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                            className="h-11 px-6"
                             onClick={onBack}
                         >
                             ← Back
                         </Button>
                         <Button
-                            className="h-11 px-8 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold"
+                            className="h-11 px-8 font-semibold"
                             disabled={!canConfirm}
                             onClick={handleConfirm}
                         >

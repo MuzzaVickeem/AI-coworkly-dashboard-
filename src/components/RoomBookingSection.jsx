@@ -19,14 +19,14 @@ import { useLocation } from '@/context/LocationContext';
 import { IconCheck } from '@tabler/icons-react';
 import { cn } from '@/lib/utils';
 
-// Room images
+// Room images - Professional coworking space images
 const roomImages = {
-    'Production Room': 'https://images.unsplash.com/photo-1598488035139-bdbb2231ce04?w=600&h=400&fit=crop',
-    'Conference Room': 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&h=400&fit=crop',
-    'ITS Bay 1': 'https://images.unsplash.com/photo-1497215842964-222b430dc094?w=600&h=400&fit=crop',
-    'ITS Bay 2': 'https://images.unsplash.com/photo-1604328698692-f76ea9498e76?w=600&h=400&fit=crop',
-    'Third Eye': 'https://images.unsplash.com/photo-1552581234-26160f608093?w=600&h=400&fit=crop',
-    'Manager Room': 'https://images.unsplash.com/photo-1604328702728-d26d2062c20b?w=600&h=400&fit=crop',
+    'Production Room': 'https://images.unsplash.com/photo-1497366811353-6870744d04b2?w=600&h=400&fit=crop',
+    'Conference Room': 'https://images.unsplash.com/photo-1431540015161-0bf868a2d407?w=600&h=400&fit=crop',
+    'ITS Bay 1': 'https://images.unsplash.com/photo-1527192491265-7e15c55b1ed2?w=600&h=400&fit=crop',
+    'ITS Bay 2': 'https://images.unsplash.com/photo-1527192491265-7e15c55b1ed2?w=600&h=400&fit=crop',
+    'Third Eye': 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=600&h=400&fit=crop',
+    'Manager Room': 'https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=600&h=400&fit=crop',
 };
 
 const formatPrice = (amount) => `₹${amount.toLocaleString('en-IN')}`;
@@ -202,7 +202,7 @@ function BookingDialog({ room, onClose, onProceedToTenant }) {
                             Cancel
                         </Button>
                         <Button
-                            className="h-12 px-8 bg-blue-600 hover:bg-blue-700 text-white font-semibold"
+                            className="h-12 px-8 font-semibold"
                             disabled={!canProceed}
                             onClick={handleProceed}
                         >
@@ -353,7 +353,7 @@ export function RoomBookingSection() {
                                 >
                                     <DialogTrigger asChild>
                                         <Button
-                                            className="w-full bg-blue-600 hover:bg-blue-700 text-white mt-auto disabled:opacity-50 disabled:cursor-not-allowed"
+                                            className="w-full mt-auto disabled:opacity-50 disabled:cursor-not-allowed"
                                             disabled={room.isOccupied}
                                         >
                                             {room.isOccupied

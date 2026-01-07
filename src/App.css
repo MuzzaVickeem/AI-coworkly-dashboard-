@@ -24,12 +24,8 @@
   background: transparent !important;
 }
 
-/* Smooth transitions for theme */
-* {
-  transition-property: background-color, border-color, color;
-  transition-duration: 150ms;
-  transition-timing-function: ease;
-}
+/* Smooth transitions for theme - removed restrictive global * transition to allow transform animations */
+
 
 /* Override for animations that shouldn't have color transition */
 [class*="animate-"],

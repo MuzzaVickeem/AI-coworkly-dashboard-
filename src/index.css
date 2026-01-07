@@ -84,6 +84,13 @@
   --sidebar-accent-foreground: #2563EB;
   --sidebar-border: #E2E8F0;
   --sidebar-ring: #2563EB;
+
+  /* Button Depth & Interaction */
+  --btn-lift: translateY(-1.5px);
+  --btn-press: translateY(0.5px);
+  --btn-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --btn-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --btn-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
 }
 
 /* Keep dark mode variables for reference but not used */
@@ -129,6 +136,20 @@
   body {
     @apply bg-background text-foreground antialiased;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  /* Global Button Premium Interactions */
+  [data-slot="button"] {
+    position: relative;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  [data-slot="button"]:hover:not(:disabled) {
+    transform: var(--btn-lift);
+  }
+
+  [data-slot="button"]:active:not(:disabled) {
+    transform: var(--btn-press);
   }
 }
 

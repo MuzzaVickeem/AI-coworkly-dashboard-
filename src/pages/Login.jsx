@@ -55,7 +55,7 @@ export function Login() {
                             initial={{ scale: 0 }}
                             animate={{ scale: 1 }}
                             transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
-                            className="mx-auto mb-4 w-16 h-16 rounded-2xl bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-600/25"
+                            className="mx-auto mb-4 w-16 h-16 rounded-2xl bg-primary flex items-center justify-center shadow-lg shadow-primary/25"
                         >
                             <IconArmchair2 size={32} className="text-white" />
                         </motion.div>
@@ -73,14 +73,14 @@ export function Login() {
                             <TabsList className="grid w-full grid-cols-2 bg-slate-100">
                                 <TabsTrigger
                                     value="admin"
-                                    className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-slate-600 flex items-center gap-2"
+                                    className="data-[state=active]:bg-primary data-[state=active]:text-white text-slate-600 flex items-center gap-2 rounded-lg transition-all"
                                 >
                                     <IconShieldCheck size={16} />
                                     Admin
                                 </TabsTrigger>
                                 <TabsTrigger
                                     value="director"
-                                    className="data-[state=active]:bg-violet-600 data-[state=active]:text-white text-slate-600 flex items-center gap-2"
+                                    className="data-[state=active]:bg-primary data-[state=active]:text-white text-slate-600 flex items-center gap-2 rounded-lg transition-all"
                                 >
                                     <IconEye size={16} />
                                     Director
@@ -184,10 +184,7 @@ export function Login() {
                                 <Button
                                     type="submit"
                                     disabled={isLoading}
-                                    className={`w-full font-medium h-11 transition-all duration-200 ${loginType === 'admin'
-                                        ? 'bg-blue-600 hover:bg-blue-700'
-                                        : 'bg-violet-600 hover:bg-violet-700'
-                                        } text-white shadow-md`}
+                                    className="w-full font-semibold h-11"
                                 >
                                     <motion.span
                                         whileHover={{ scale: 1.02 }}

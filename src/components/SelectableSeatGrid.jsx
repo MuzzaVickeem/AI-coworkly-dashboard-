@@ -1,5 +1,6 @@
 import { cn } from '@/lib/utils';
 import { IconArmchair2, IconCheck } from '@tabler/icons-react';
+import { Button } from '@/components/ui/button';
 
 /**
  * Selectable seat grid for booking dialog
@@ -25,16 +26,17 @@ export function SelectableSeatGrid({ capacity, selectedSeats = [], onSeatToggle,
                     const isSelected = isSeatSelected(index);
 
                     return (
-                        <button
+                        <Button
                             key={index}
+                            variant={isSelected ? "default" : "outline"}
+                            size="icon-sm"
                             onClick={() => !isBooked && onSeatToggle(index)}
                             disabled={isBooked}
                             className={cn(
-                                'w-10 h-10 rounded-lg flex items-center justify-center',
-                                'transition-all duration-200 relative',
-                                isBooked && 'bg-slate-100 border border-slate-200 text-slate-300 cursor-not-allowed',
-                                !isBooked && !isSelected && 'bg-blue-50 border border-blue-200 text-blue-400 hover:bg-blue-100 hover:border-blue-300 cursor-pointer',
-                                isSelected && 'bg-blue-600 border border-blue-600 text-white cursor-pointer shadow-md shadow-blue-200'
+                                'w-10 h-10 rounded-lg',
+                                isBooked && 'opacity-50 grayscale',
+                                !isBooked && !isSelected && 'border-blue-100 bg-blue-50/30 text-blue-400 hover:border-blue-300 hover:bg-blue-100/50',
+                                isSelected && 'scale-[1.05] shadow-lg shadow-primary/20'
                             )}
                         >
                             {isSelected ? (
@@ -42,7 +44,7 @@ export function SelectableSeatGrid({ capacity, selectedSeats = [], onSeatToggle,
                             ) : (
                                 <IconArmchair2 size={18} />
                             )}
-                        </button>
+                        </Button>
                     );
                 })}
             </div>
@@ -50,11 +52,11 @@ export function SelectableSeatGrid({ capacity, selectedSeats = [], onSeatToggle,
             {/* Legend */}
             <div className="flex items-center gap-4 text-xs text-slate-500 mt-2">
                 <div className="flex items-center gap-1.5">
-                    <div className="w-3 h-3 rounded bg-blue-50 border border-blue-200" />
+                    <div className="w-3 h-3 rounded bg-blue-50/50 border border-blue-100" />
                     <span>Available</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                    <div className="w-3 h-3 rounded bg-blue-600" />
+                    <div className="w-3 h-3 rounded bg-primary" />
                     <span>Selected</span>
                 </div>
                 <div className="flex items-center gap-1.5">

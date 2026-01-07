@@ -189,8 +189,7 @@ export function StaffAttendance() {
                                                                     variant="ghost"
                                                                     size="sm"
                                                                     onClick={() => handleAttendanceChange(staffMember.id, 'Present')}
-                                                                    className={`text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 ${attendance?.status === 'Present' ? 'bg-emerald-50' : ''
-                                                                        }`}
+                                                                    className=""
                                                                 >
                                                                     <IconCheck size={16} />
                                                                 </Button>
@@ -198,8 +197,7 @@ export function StaffAttendance() {
                                                                     variant="ghost"
                                                                     size="sm"
                                                                     onClick={() => handleAttendanceChange(staffMember.id, 'Absent')}
-                                                                    className={`text-red-600 hover:text-red-700 hover:bg-red-50 ${attendance?.status === 'Absent' ? 'bg-red-50' : ''
-                                                                        }`}
+                                                                    className=""
                                                                 >
                                                                     <IconX size={16} />
                                                                 </Button>
@@ -208,7 +206,7 @@ export function StaffAttendance() {
                                                                         variant="ghost"
                                                                         size="sm"
                                                                         onClick={() => handleTimeOut(staffMember.id)}
-                                                                        className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                                                                        className=""
                                                                     >
                                                                         <IconClock size={16} />
                                                                     </Button>

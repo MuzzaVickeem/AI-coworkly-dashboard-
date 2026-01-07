@@ -79,7 +79,7 @@ export function CompanySelection() {
                         <Button
                             variant="outline"
                             onClick={handleLogout}
-                            className="border-slate-300 text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+                            className=""
                         >
                             <IconLogout size={18} className="mr-2" />
                             Logout

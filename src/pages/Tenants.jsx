@@ -170,7 +170,7 @@ export function Tenants() {
                                 </p>
                                 <Button
                                     onClick={handleGoToSeats}
-                                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                                    className=""
                                 >
                                     <IconPlus size={18} className="mr-2" />
                                     Book a Room
@@ -245,7 +245,7 @@ export function Tenants() {
                                                     variant="ghost"
                                                     size="sm"
                                                     onClick={() => handleViewVendor(vendor)}
-                                                    className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                                                    className=""
                                                 >
                                                     <IconEye size={18} />
                                                 </Button>
@@ -265,6 +265,6 @@ export function Tenants() {
                 onClose={handleCloseDialog}
                 vendor={selectedVendor}
             />
-        </div>
+        </div >
     );
 }

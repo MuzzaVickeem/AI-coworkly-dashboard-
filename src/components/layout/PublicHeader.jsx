@@ -25,7 +25,7 @@ export function PublicHeader() {
             {!isLoggedIn && (
                 <Button
                     onClick={handleLogin}
-                    className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
+                    className=""
                 >
                     <IconLogin size={18} className="mr-2" />
                     Login
