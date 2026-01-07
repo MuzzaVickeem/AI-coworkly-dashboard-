@@ -1,25 +1,38 @@
-/* App-specific styles */
+/* App-specific styles - Light Editorial Theme */
 
-/* Custom scrollbar for dark theme */
+/* Custom scrollbar for light theme */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #171717;
+  background: #F1F5F9;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #404040;
+  background: #CBD5E1;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #525252;
+  background: #94A3B8;
 }
 
 /* Ensure charts have proper background */
 .ant-chart-container {
   background: transparent !important;
+}
+
+/* Smooth transitions for theme */
+* {
+  transition-property: background-color, border-color, color;
+  transition-duration: 150ms;
+  transition-timing-function: ease;
+}
+
+/* Override for animations that shouldn't have color transition */
+[class*="animate-"],
+.motion-safe\:animate- {
+  transition-property: none;
 }

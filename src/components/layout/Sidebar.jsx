@@ -14,7 +14,6 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 const navItems = [
-
     {
         label: 'Dashboard',
         icon: IconLayoutDashboard,
@@ -45,10 +44,10 @@ export function Sidebar() {
             initial={false}
             animate={{ width: isCollapsed ? 72 : 256 }}
             transition={{ duration: 0.3, ease: 'easeInOut' }}
-            className="h-screen bg-neutral-900 border-r border-neutral-800 flex flex-col fixed left-0 top-0 z-40"
+            className="h-screen bg-white border-r border-slate-200 flex flex-col fixed left-0 top-0 z-40 shadow-sm"
         >
             {/* Logo */}
-            <div className="h-16 flex items-center justify-between px-4 border-b border-neutral-800">
+            <div className="h-16 flex items-center justify-between px-4 border-b border-slate-100">
                 <AnimatePresence mode="wait">
                     {!isCollapsed && (
                         <motion.div
@@ -56,35 +55,36 @@ export function Sidebar() {
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
                             transition={{ duration: 0.2 }}
-                            className="flex items-center gap-2"
+                            className="flex items-center gap-3"
                         >
-                            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-md shadow-blue-500/25">
                                 <IconArmchair2 size={18} className="text-white" />
                             </div>
-                            <span className="font-semibold text-white whitespace-nowrap">CoWork Ops</span>
+                            <span className="font-semibold text-slate-900 whitespace-nowrap tracking-tight">CoWork Ops</span>
                         </motion.div>
                     )}
                 </AnimatePresence>
                 {isCollapsed && (
-                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center mx-auto">
+                    <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center mx-auto shadow-md shadow-blue-500/25">
                         <IconArmchair2 size={18} className="text-white" />
                     </div>
                 )}
             </div>
 
             {/* Navigation */}
-            <nav className="flex-1 py-4 px-2 space-y-1">
+            <nav className="flex-1 py-6 px-3 space-y-1">
                 {navItems.map((item) => (
                     <NavLink
                         key={item.path}
                         to={item.path}
+                        end={item.path === '/dashboard'}
                         className={({ isActive }) =>
                             cn(
                                 'flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200',
-                                'hover:bg-neutral-800/50',
+                                'hover:bg-slate-50',
                                 isActive
-                                    ? 'bg-neutral-800 text-white'
-                                    : 'text-neutral-400 hover:text-white'
+                                    ? 'bg-blue-50 text-blue-600 font-medium'
+                                    : 'text-slate-500 hover:text-slate-900'
                             )
                         }
                     >
@@ -96,7 +96,7 @@ export function Sidebar() {
                                     animate={{ opacity: 1, width: 'auto' }}
                                     exit={{ opacity: 0, width: 0 }}
                                     transition={{ duration: 0.2 }}
-                                    className="whitespace-nowrap text-sm font-medium"
+                                    className="whitespace-nowrap text-sm"
                                 >
                                     {item.label}
                                 </motion.span>
@@ -107,12 +107,12 @@ export function Sidebar() {
             </nav>
 
             {/* Collapse toggle */}
-            <div className="p-2 border-t border-neutral-800">
+            <div className="p-3 border-t border-slate-100">
                 <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => setIsCollapsed(!isCollapsed)}
-                    className="w-full justify-center text-neutral-400 hover:text-white hover:bg-neutral-800"
+                    className="w-full justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-50"
                 >
                     {isCollapsed ? <IconChevronRight size={18} /> : <IconChevronLeft size={18} />}
                 </Button>

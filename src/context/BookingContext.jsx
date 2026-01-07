@@ -2,10 +2,10 @@ import { createContext, useContext, useState, useCallback } from 'react';
 
 const BookingContext = createContext(null);
 
-// Room data organized by location
+// Room data organized by location ID (matching locations.js)
 const initialRoomsByLocation = {
-    // Mount Road - 6 rooms (existing)
-    'mount-road': [
+    // loc-a: Ideassion Technology (Mount Road) - 6 rooms
+    'loc-a': [
         { id: 'mr-1', name: 'Production Room', capacity: 8, pricePerDay: 2500, allowSeatSelection: false, isOccupied: false, bookedSeats: [], booking: null },
         { id: 'mr-2', name: 'Conference Room', capacity: 8, pricePerDay: 3000, allowSeatSelection: false, isOccupied: false, bookedSeats: [], booking: null },
         { id: 'mr-3', name: 'ITS Bay 1', capacity: 15, pricePerDay: 5000, allowSeatSelection: true, isOccupied: false, bookedSeats: [], booking: null },
@@ -13,14 +13,14 @@ const initialRoomsByLocation = {
         { id: 'mr-5', name: 'Third Eye', capacity: 12, pricePerDay: 4000, allowSeatSelection: false, isOccupied: false, bookedSeats: [], booking: null },
         { id: 'mr-6', name: 'Manager Room', capacity: 5, pricePerDay: 1500, allowSeatSelection: false, isOccupied: false, bookedSeats: [], booking: null },
     ],
-    // Royappettah - 3 rooms (new)
-    'royappettah': [
+    // loc-b: IITT (Royappettah) - 3 rooms
+    'loc-b': [
         { id: 'rp-1', name: 'Production Room', capacity: 5, pricePerDay: 2000, allowSeatSelection: false, isOccupied: false, bookedSeats: [], booking: null },
         { id: 'rp-2', name: 'Conference Room', capacity: 4, pricePerDay: 2500, allowSeatSelection: false, isOccupied: false, bookedSeats: [], booking: null },
         { id: 'rp-3', name: 'Manager Room', capacity: 4, pricePerDay: 1200, allowSeatSelection: false, isOccupied: false, bookedSeats: [], booking: null },
     ],
-    // Perungudi - 3 rooms (new)
-    'perungudi': [
+    // loc-c: LaunchPod (Perungudi) - 3 rooms
+    'loc-c': [
         { id: 'pg-1', name: 'Production Room', capacity: 5, pricePerDay: 2000, allowSeatSelection: false, isOccupied: false, bookedSeats: [], booking: null },
         { id: 'pg-2', name: 'Conference Room', capacity: 4, pricePerDay: 2500, allowSeatSelection: false, isOccupied: false, bookedSeats: [], booking: null },
         { id: 'pg-3', name: 'Manager Room', capacity: 4, pricePerDay: 1200, allowSeatSelection: false, isOccupied: false, bookedSeats: [], booking: null },

@@ -18,18 +18,18 @@ export function Header() {
     };
 
     return (
-        <header className="h-16 bg-neutral-900/80 backdrop-blur-sm border-b border-neutral-800 flex items-center justify-between px-6 sticky top-0 z-30">
+        <header className="h-16 bg-white/80 backdrop-blur-md border-b border-slate-200/60 flex items-center justify-between px-8 sticky top-0 z-30">
             {/* Left - Company Info */}
             <div className="flex items-center gap-4">
                 <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-gradient-to-br from-blue-500/20 to-purple-500/20 border border-blue-500/20">
-                        <IconBuilding size={18} className="text-blue-400" />
+                    <div className="p-2 rounded-lg bg-blue-50 border border-blue-100">
+                        <IconBuilding size={18} className="text-blue-600" />
                     </div>
                     <div>
-                        <p className="text-sm font-medium text-white">
+                        <p className="text-sm font-medium text-slate-900">
                             {selectedLocation?.name || 'No company selected'}
                         </p>
-                        <p className="text-xs text-neutral-400">
+                        <p className="text-xs text-slate-500">
                             {selectedLocation?.totalSeats} seats capacity
                         </p>
                     </div>
@@ -42,7 +42,7 @@ export function Header() {
                     variant="ghost"
                     size="sm"
                     onClick={handleLogout}
-                    className="text-neutral-400 hover:text-red-400 hover:bg-red-500/10"
+                    className="text-slate-500 hover:text-red-600 hover:bg-red-50"
                 >
                     <IconLogout size={18} className="mr-2" />
                     Logout

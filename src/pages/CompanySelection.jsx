@@ -60,9 +60,9 @@ export function CompanySelection() {
     };
 
     return (
-        <div className="min-h-screen bg-neutral-950 p-8">
-            {/* Background gradient */}
-            <div className="fixed inset-0 bg-gradient-to-br from-blue-900/10 via-neutral-950 to-purple-900/10 pointer-events-none" />
+        <div className="min-h-screen bg-[#FAFAFA] p-8">
+            {/* Subtle background gradient */}
+            <div className="fixed inset-0 bg-gradient-to-br from-blue-50/50 via-[#FAFAFA] to-slate-100/50 pointer-events-none" />
 
             <div className="relative z-10 max-w-6xl mx-auto">
                 {/* Header */}
@@ -72,14 +72,14 @@ export function CompanySelection() {
                     className="flex items-center justify-between mb-8"
                 >
                     <div>
-                        <h1 className="text-3xl font-bold text-white mb-2">Select a Company</h1>
-                        <p className="text-neutral-400">Choose a company to view its dashboard</p>
+                        <h1 className="text-3xl font-bold text-slate-900 mb-2 tracking-tight">Select a Company</h1>
+                        <p className="text-slate-500">Choose a company to view its dashboard</p>
                     </div>
                     <div className="flex items-center gap-3">
                         <Button
                             variant="outline"
                             onClick={handleLogout}
-                            className="border-neutral-700 text-neutral-300 hover:text-white hover:bg-neutral-800"
+                            className="border-slate-300 text-slate-600 hover:text-slate-900 hover:bg-slate-100"
                         >
                             <IconLogout size={18} className="mr-2" />
                             Logout
@@ -97,8 +97,6 @@ export function CompanySelection() {
                     {companies.map((company) => {
                         const kpis = calculateLocationKPIs(company.id);
 
-                        console.log(company, 'company')
-
                         return (
                             <motion.div
                                 key={company.id}
@@ -108,23 +106,23 @@ export function CompanySelection() {
                             >
                                 <Card
                                     onClick={() => handleSelectCompany(company.id)}
-                                    className="bg-neutral-900/60 border-neutral-800 hover:border-blue-500/50 cursor-pointer transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/10 backdrop-blur-sm overflow-hidden group"
+                                    className="bg-white border-slate-200 hover:border-blue-300 cursor-pointer transition-all duration-300 hover:shadow-xl hover:shadow-blue-100/50 overflow-hidden group"
                                 >
                                     {/* Gradient overlay on hover */}
-                                    <div className="absolute inset-0 bg-gradient-to-br from-blue-500/0 to-purple-500/0 group-hover:from-blue-500/5 group-hover:to-purple-500/5 transition-all duration-300" />
+                                    <div className="absolute inset-0 bg-gradient-to-br from-blue-50/0 to-blue-50/0 group-hover:from-blue-50/50 group-hover:to-slate-50/30 transition-all duration-300" />
 
                                     <CardContent className="p-6 relative">
                                         {/* Header */}
                                         <div className="flex items-start justify-between mb-4">
                                             <div className="flex items-start gap-3 flex-1">
-                                                <div className="p-2 rounded-lg bg-gradient-to-br from-blue-500/20 to-purple-500/20 border border-blue-500/20 flex-shrink-0">
-                                                    <IconBuilding size={20} className="text-blue-400" />
+                                                <div className="p-2 rounded-lg bg-blue-50 border border-blue-100 flex-shrink-0">
+                                                    <IconBuilding size={20} className="text-blue-600" />
                                                 </div>
                                                 <div className="flex-1 min-w-0">
-                                                    <h3 className="text-lg font-semibold text-white mb-1">
+                                                    <h3 className="text-lg font-semibold text-slate-900 mb-1">
                                                         {company.name}
                                                     </h3>
-                                                    <div className="flex items-start gap-1 text-neutral-400 text-xs">
+                                                    <div className="flex items-start gap-1 text-slate-500 text-xs">
                                                         <IconMapPin size={14} className="flex-shrink-0 mt-0.5" />
                                                         <span className="line-clamp-2">{company.address}</span>
                                                     </div>
@@ -135,29 +133,29 @@ export function CompanySelection() {
 
                                         {/* Stats */}
                                         <div className="grid grid-cols-2 gap-4 mt-6">
-                                            <div className="bg-neutral-800/50 rounded-lg p-3">
-                                                <div className="flex items-center gap-2 text-neutral-400 text-xs mb-1">
+                                            <div className="bg-slate-50 rounded-lg p-3 border border-slate-100">
+                                                <div className="flex items-center gap-2 text-slate-500 text-xs mb-1">
                                                     <IconArmchair2 size={14} />
                                                     Total Seats
                                                 </div>
-                                                <p className="text-xl font-bold text-white">
+                                                <p className="text-xl font-bold text-slate-900">
                                                     {company.totalSeats}
                                                 </p>
                                             </div>
-                                            <div className="bg-neutral-800/50 rounded-lg p-3">
-                                                <div className="flex items-center gap-2 text-neutral-400 text-xs mb-1">
+                                            <div className="bg-slate-50 rounded-lg p-3 border border-slate-100">
+                                                <div className="flex items-center gap-2 text-slate-500 text-xs mb-1">
                                                     <IconPercentage size={14} />
                                                     Occupancy
                                                 </div>
-                                                <p className="text-xl font-bold text-white">
+                                                <p className="text-xl font-bold text-blue-600">
                                                     {kpis?.occupancyPercentage || 0}%
                                                 </p>
                                             </div>
                                         </div>
 
                                         {/* Click indicator */}
-                                        <div className="mt-4 pt-4 border-t border-neutral-800 text-center">
-                                            <span className="text-sm text-neutral-500 group-hover:text-blue-400 transition-colors">
+                                        <div className="mt-4 pt-4 border-t border-slate-100 text-center">
+                                            <span className="text-sm text-slate-400 group-hover:text-blue-600 transition-colors">
                                                 Click to view dashboard →
                                             </span>
                                         </div>

@@ -80,14 +80,14 @@ export function StaffAttendance() {
     };
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-8">
             {/* Page Header */}
             <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
             >
-                <h1 className="text-2xl font-bold text-white mb-1">Staff Attendance</h1>
-                <p className="text-neutral-400">{selectedLocation?.name}</p>
+                <h1 className="text-3xl font-bold text-slate-900 mb-1 tracking-tight">Staff Attendance</h1>
+                <p className="text-slate-500">{selectedLocation?.name}</p>
             </motion.div>
 
             {/* Stats Cards */}
@@ -95,35 +95,35 @@ export function StaffAttendance() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
-                className="grid grid-cols-1 md:grid-cols-3 gap-4"
+                className="grid grid-cols-1 md:grid-cols-3 gap-5"
             >
-                <Card className="bg-gradient-to-br from-blue-500/20 to-blue-600/5 border-blue-500/30">
+                <Card className="bg-white border-slate-200 shadow-sm hover:shadow-md transition-all">
                     <CardContent className="p-6">
-                        <p className="text-sm text-neutral-400 mb-1">Total Staff</p>
-                        <p className="text-3xl font-bold text-white">{stats.total}</p>
+                        <p className="text-sm text-slate-500 mb-1">Total Staff</p>
+                        <p className="text-3xl font-bold text-blue-600">{stats.total}</p>
                     </CardContent>
                 </Card>
-                <Card className="bg-gradient-to-br from-green-500/20 to-green-600/5 border-green-500/30">
+                <Card className="bg-white border-slate-200 shadow-sm hover:shadow-md transition-all">
                     <CardContent className="p-6">
-                        <p className="text-sm text-neutral-400 mb-1">Present</p>
-                        <p className="text-3xl font-bold text-white">{stats.present}</p>
+                        <p className="text-sm text-slate-500 mb-1">Present</p>
+                        <p className="text-3xl font-bold text-emerald-600">{stats.present}</p>
                     </CardContent>
                 </Card>
-                <Card className="bg-gradient-to-br from-red-500/20 to-red-600/5 border-red-500/30">
+                <Card className="bg-white border-slate-200 shadow-sm hover:shadow-md transition-all">
                     <CardContent className="p-6">
-                        <p className="text-sm text-neutral-400 mb-1">Absent</p>
-                        <p className="text-3xl font-bold text-white">{stats.absent}</p>
+                        <p className="text-sm text-slate-500 mb-1">Absent</p>
+                        <p className="text-3xl font-bold text-red-600">{stats.absent}</p>
                     </CardContent>
                 </Card>
             </motion.div>
 
             {/* Tabs */}
             <Tabs defaultValue="today" className="space-y-4">
-                <TabsList className="bg-neutral-800 border-neutral-700">
-                    <TabsTrigger value="today" className="data-[state=active]:bg-neutral-700">
+                <TabsList className="bg-slate-100 border border-slate-200">
+                    <TabsTrigger value="today" className="data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm">
                         Today
                     </TabsTrigger>
-                    <TabsTrigger value="history" className="data-[state=active]:bg-neutral-700">
+                    <TabsTrigger value="history" className="data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm">
                         History
                     </TabsTrigger>
                 </TabsList>
@@ -134,13 +134,13 @@ export function StaffAttendance() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                     >
-                        <Card className="bg-neutral-900/50 border-neutral-800">
-                            <CardHeader className="flex flex-row items-center justify-between">
-                                <CardTitle className="text-lg font-semibold text-white">
+                        <Card className="bg-white border-slate-200 shadow-sm">
+                            <CardHeader className="flex flex-row items-center justify-between border-b border-slate-100">
+                                <CardTitle className="text-lg font-semibold text-slate-900">
                                     Attendance - {selectedDate}
                                 </CardTitle>
                                 {!isAdmin && (
-                                    <Badge className="bg-purple-600/20 text-purple-400 border-purple-600/30">
+                                    <Badge className="bg-violet-50 text-violet-700 border border-violet-200">
                                         View Only
                                     </Badge>
                                 )}
@@ -148,38 +148,38 @@ export function StaffAttendance() {
                             <CardContent className="p-0">
                                 <Table>
                                     <TableHeader>
-                                        <TableRow className="border-neutral-800 hover:bg-transparent">
-                                            <TableHead className="text-neutral-400">Name</TableHead>
-                                            <TableHead className="text-neutral-400">Role</TableHead>
-                                            <TableHead className="text-neutral-400">Status</TableHead>
-                                            <TableHead className="text-neutral-400">Time In</TableHead>
-                                            <TableHead className="text-neutral-400">Time Out</TableHead>
-                                            {isAdmin && <TableHead className="text-neutral-400 text-right">Actions</TableHead>}
+                                        <TableRow className="border-slate-200 hover:bg-transparent">
+                                            <TableHead className="text-slate-500 font-medium">Name</TableHead>
+                                            <TableHead className="text-slate-500 font-medium">Role</TableHead>
+                                            <TableHead className="text-slate-500 font-medium">Status</TableHead>
+                                            <TableHead className="text-slate-500 font-medium">Time In</TableHead>
+                                            <TableHead className="text-slate-500 font-medium">Time Out</TableHead>
+                                            {isAdmin && <TableHead className="text-slate-500 font-medium text-right">Actions</TableHead>}
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
                                         {locationStaff.map((staffMember) => {
                                             const attendance = getStaffAttendance(staffMember.id);
                                             return (
-                                                <TableRow key={staffMember.id} className="border-neutral-800 hover:bg-neutral-800/30">
-                                                    <TableCell className="font-medium text-white">{staffMember.name}</TableCell>
-                                                    <TableCell className="text-neutral-300">{staffMember.role}</TableCell>
+                                                <TableRow key={staffMember.id} className="border-slate-200 hover:bg-slate-50">
+                                                    <TableCell className="font-medium text-slate-900">{staffMember.name}</TableCell>
+                                                    <TableCell className="text-slate-600">{staffMember.role}</TableCell>
                                                     <TableCell>
                                                         <Badge
                                                             variant={attendance?.status === 'Present' ? 'default' : 'secondary'}
                                                             className={
                                                                 attendance?.status === 'Present'
-                                                                    ? 'bg-green-600/20 text-green-400 border-green-600/30'
-                                                                    : 'bg-red-600/20 text-red-400 border-red-600/30'
+                                                                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                                                    : 'bg-red-50 text-red-700 border border-red-200'
                                                             }
                                                         >
                                                             {attendance?.status || 'Not Marked'}
                                                         </Badge>
                                                     </TableCell>
-                                                    <TableCell className="text-neutral-300">
+                                                    <TableCell className="text-slate-600">
                                                         {attendance?.timeIn || '-'}
                                                     </TableCell>
-                                                    <TableCell className="text-neutral-300">
+                                                    <TableCell className="text-slate-600">
                                                         {attendance?.timeOut || '-'}
                                                     </TableCell>
                                                     {isAdmin && (
@@ -189,7 +189,7 @@ export function StaffAttendance() {
                                                                     variant="ghost"
                                                                     size="sm"
                                                                     onClick={() => handleAttendanceChange(staffMember.id, 'Present')}
-                                                                    className={`text-green-400 hover:text-green-300 hover:bg-green-600/20 ${attendance?.status === 'Present' ? 'bg-green-600/20' : ''
+                                                                    className={`text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 ${attendance?.status === 'Present' ? 'bg-emerald-50' : ''
                                                                         }`}
                                                                 >
                                                                     <IconCheck size={16} />
@@ -198,7 +198,7 @@ export function StaffAttendance() {
                                                                     variant="ghost"
                                                                     size="sm"
                                                                     onClick={() => handleAttendanceChange(staffMember.id, 'Absent')}
-                                                                    className={`text-red-400 hover:text-red-300 hover:bg-red-600/20 ${attendance?.status === 'Absent' ? 'bg-red-600/20' : ''
+                                                                    className={`text-red-600 hover:text-red-700 hover:bg-red-50 ${attendance?.status === 'Absent' ? 'bg-red-50' : ''
                                                                         }`}
                                                                 >
                                                                     <IconX size={16} />
@@ -208,7 +208,7 @@ export function StaffAttendance() {
                                                                         variant="ghost"
                                                                         size="sm"
                                                                         onClick={() => handleTimeOut(staffMember.id)}
-                                                                        className="text-blue-400 hover:text-blue-300 hover:bg-blue-600/20"
+                                                                        className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
                                                                     >
                                                                         <IconClock size={16} />
                                                                     </Button>
@@ -232,19 +232,19 @@ export function StaffAttendance() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                     >
-                        <Card className="bg-neutral-900/50 border-neutral-800">
-                            <CardHeader className="flex flex-row items-center justify-between">
-                                <CardTitle className="text-lg font-semibold text-white flex items-center gap-2">
-                                    <IconCalendar size={20} className="text-blue-400" />
+                        <Card className="bg-white border-slate-200 shadow-sm">
+                            <CardHeader className="flex flex-row items-center justify-between border-b border-slate-100">
+                                <CardTitle className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+                                    <IconCalendar size={20} className="text-blue-600" />
                                     Attendance History
                                 </CardTitle>
                                 <Select value={selectedDate} onValueChange={setSelectedDate}>
-                                    <SelectTrigger className="w-48 bg-neutral-800 border-neutral-700">
+                                    <SelectTrigger className="w-48 bg-white border-slate-300">
                                         <SelectValue />
                                     </SelectTrigger>
-                                    <SelectContent className="bg-neutral-800 border-neutral-700">
+                                    <SelectContent className="bg-white border-slate-200">
                                         {last7Days.map((date) => (
-                                            <SelectItem key={date} value={date} className="text-white">
+                                            <SelectItem key={date} value={date} className="text-slate-900">
                                                 {new Date(date).toLocaleDateString('en-US', {
                                                     weekday: 'short',
                                                     month: 'short',
@@ -258,37 +258,37 @@ export function StaffAttendance() {
                             <CardContent className="p-0">
                                 <Table>
                                     <TableHeader>
-                                        <TableRow className="border-neutral-800 hover:bg-transparent">
-                                            <TableHead className="text-neutral-400">Name</TableHead>
-                                            <TableHead className="text-neutral-400">Role</TableHead>
-                                            <TableHead className="text-neutral-400">Status</TableHead>
-                                            <TableHead className="text-neutral-400">Time In</TableHead>
-                                            <TableHead className="text-neutral-400">Time Out</TableHead>
+                                        <TableRow className="border-slate-200 hover:bg-transparent">
+                                            <TableHead className="text-slate-500 font-medium">Name</TableHead>
+                                            <TableHead className="text-slate-500 font-medium">Role</TableHead>
+                                            <TableHead className="text-slate-500 font-medium">Status</TableHead>
+                                            <TableHead className="text-slate-500 font-medium">Time In</TableHead>
+                                            <TableHead className="text-slate-500 font-medium">Time Out</TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
                                         {locationStaff.map((staffMember) => {
                                             const attendance = getStaffAttendance(staffMember.id);
                                             return (
-                                                <TableRow key={staffMember.id} className="border-neutral-800 hover:bg-neutral-800/30">
-                                                    <TableCell className="font-medium text-white">{staffMember.name}</TableCell>
-                                                    <TableCell className="text-neutral-300">{staffMember.role}</TableCell>
+                                                <TableRow key={staffMember.id} className="border-slate-200 hover:bg-slate-50">
+                                                    <TableCell className="font-medium text-slate-900">{staffMember.name}</TableCell>
+                                                    <TableCell className="text-slate-600">{staffMember.role}</TableCell>
                                                     <TableCell>
                                                         <Badge
                                                             variant={attendance?.status === 'Present' ? 'default' : 'secondary'}
                                                             className={
                                                                 attendance?.status === 'Present'
-                                                                    ? 'bg-green-600/20 text-green-400 border-green-600/30'
-                                                                    : 'bg-red-600/20 text-red-400 border-red-600/30'
+                                                                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                                                    : 'bg-red-50 text-red-700 border border-red-200'
                                                             }
                                                         >
                                                             {attendance?.status || 'Not Marked'}
                                                         </Badge>
                                                     </TableCell>
-                                                    <TableCell className="text-neutral-300">
+                                                    <TableCell className="text-slate-600">
                                                         {attendance?.timeIn || '-'}
                                                     </TableCell>
-                                                    <TableCell className="text-neutral-300">
+                                                    <TableCell className="text-slate-600">
                                                         {attendance?.timeOut || '-'}
                                                     </TableCell>
                                                 </TableRow>

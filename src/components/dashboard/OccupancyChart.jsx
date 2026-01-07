@@ -42,32 +42,32 @@ export function OccupancyChart({ locationId }) {
         colorField: 'type',
         group: true,
         style: {
-            radiusTopLeft: 4,
-            radiusTopRight: 4,
+            radiusTopLeft: 6,
+            radiusTopRight: 6,
         },
         scale: {
             color: {
-                range: ['#3b82f6', '#6b7280'],
+                range: ['#2563EB', '#94A3B8'],
             },
         },
         axis: {
             x: {
                 title: false,
                 labelFontSize: 12,
-                labelFill: '#a3a3a3',
-                line: { style: { stroke: '#404040' } },
+                labelFill: '#64748B',
+                line: { style: { stroke: '#E2E8F0' } },
             },
             y: {
                 title: false,
                 labelFontSize: 12,
-                labelFill: '#a3a3a3',
-                grid: { line: { style: { stroke: '#303030' } } },
+                labelFill: '#64748B',
+                grid: { line: { style: { stroke: '#F1F5F9' } } },
             },
         },
         legend: {
             color: {
                 position: 'top-right',
-                itemLabelFill: '#a3a3a3',
+                itemLabelFill: '#64748B',
                 itemLabelFontSize: 12,
             },
         },
@@ -78,7 +78,7 @@ export function OccupancyChart({ locationId }) {
             elementHighlight: true,
         },
         state: {
-            active: { style: { fill: '#60a5fa' } },
+            active: { style: { fill: '#3B82F6' } },
         },
     };
 
@@ -88,9 +88,9 @@ export function OccupancyChart({ locationId }) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
         >
-            <Card className="bg-neutral-900/50 border-neutral-800">
+            <Card className="bg-white border-slate-200 shadow-sm">
                 <CardHeader className="pb-2">
-                    <CardTitle className="text-lg font-semibold text-white">Seat Occupancy</CardTitle>
+                    <CardTitle className="text-lg font-semibold text-slate-900">Seat Occupancy</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <div className="h-64">

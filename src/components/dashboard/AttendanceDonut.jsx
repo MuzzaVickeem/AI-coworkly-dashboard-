@@ -22,21 +22,21 @@ export function AttendanceDonut({ present, absent }) {
         innerRadius: 0.6,
         scale: {
             color: {
-                range: ['#22c55e', '#ef4444'],
+                range: ['#10B981', '#F87171'],
             },
         },
         label: {
             text: 'value',
             position: 'outside',
             style: {
-                fill: '#a3a3a3',
+                fill: '#64748B',
                 fontSize: 12,
             },
         },
         legend: {
             color: {
                 position: 'bottom',
-                itemLabelFill: '#a3a3a3',
+                itemLabelFill: '#64748B',
                 itemLabelFontSize: 12,
             },
         },
@@ -50,7 +50,7 @@ export function AttendanceDonut({ present, absent }) {
                     textAlign: 'center',
                     fontSize: 24,
                     fontWeight: 'bold',
-                    fill: '#ffffff',
+                    fill: '#0F172A',
                 },
             },
             {
@@ -61,7 +61,7 @@ export function AttendanceDonut({ present, absent }) {
                     y: '58%',
                     textAlign: 'center',
                     fontSize: 12,
-                    fill: '#a3a3a3',
+                    fill: '#64748B',
                 },
             },
         ],
@@ -79,9 +79,9 @@ export function AttendanceDonut({ present, absent }) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.56, ease: [0.25, 0.46, 0.45, 0.94] }}
         >
-            <Card className="bg-neutral-900/50 border-neutral-800">
+            <Card className="bg-white border-slate-200 shadow-sm">
                 <CardHeader className="pb-2">
-                    <CardTitle className="text-lg font-semibold text-white">Staff Attendance</CardTitle>
+                    <CardTitle className="text-lg font-semibold text-slate-900">Staff Attendance</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <div className="h-64">

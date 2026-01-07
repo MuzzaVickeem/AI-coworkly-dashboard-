@@ -40,7 +40,7 @@ export function Dashboard() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
-            className="space-y-6"
+            className="space-y-8"
         >
             {/* Page Header */}
             <motion.div
@@ -51,11 +51,11 @@ export function Dashboard() {
             >
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-3xl font-bold text-white mb-1">Operations Overview</h1>
-                        <p className="text-neutral-400">{selectedLocation?.name}</p>
+                        <h1 className="text-3xl font-bold text-slate-900 mb-1 tracking-tight">Operations Overview</h1>
+                        <p className="text-slate-500">{selectedLocation?.name}</p>
                     </div>
-                    <div className="text-sm text-neutral-500">
-                        Today: {new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                    <div className="text-sm text-slate-400 bg-white px-4 py-2 rounded-lg border border-slate-200">
+                        {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' })}
                     </div>
                 </div>
             </motion.div>
@@ -64,7 +64,7 @@ export function Dashboard() {
             <AnimatePresence mode="wait">
                 <motion.div
                     key={`kpis-${animationKey}`}
-                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
+                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5"
                 >
                     <KPICard
                         title="Total Tenants"

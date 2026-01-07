@@ -111,7 +111,7 @@ export function Tenants() {
     };
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-8">
             {/* Page Header */}
             <motion.div
                 initial={{ opacity: 0, x: -20 }}
@@ -119,113 +119,113 @@ export function Tenants() {
                 className="flex items-center justify-between"
             >
                 <div>
-                    <h1 className="text-2xl font-bold text-white mb-1">Tenants</h1>
-                    <p className="text-neutral-400">{selectedLocation?.name}</p>
+                    <h1 className="text-3xl font-bold text-slate-900 mb-1 tracking-tight">Tenants</h1>
+                    <p className="text-slate-500">{selectedLocation?.name}</p>
                 </div>
                 {isAdmin && (
                     <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
                         <DialogTrigger asChild>
-                            <Button className="bg-blue-600 hover:bg-blue-700">
+                            <Button className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm">
                                 <IconPlus size={18} className="mr-2" />
                                 Add Tenant
                             </Button>
                         </DialogTrigger>
-                        <DialogContent className="bg-neutral-900 border-neutral-800 text-white max-w-lg">
+                        <DialogContent className="bg-white border-slate-200 text-slate-900 max-w-lg shadow-2xl">
                             <DialogHeader>
-                                <DialogTitle>Add New Tenant</DialogTitle>
-                                <DialogDescription className="text-neutral-400">
+                                <DialogTitle className="text-slate-900">Add New Tenant</DialogTitle>
+                                <DialogDescription className="text-slate-500">
                                     Add a new tenant to {selectedLocation?.name}
                                 </DialogDescription>
                             </DialogHeader>
                             <div className="grid gap-4 py-4">
                                 <div className="grid gap-2">
-                                    <Label>Company Name</Label>
+                                    <Label className="text-slate-700">Company Name</Label>
                                     <Input
                                         value={formData.name}
                                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                        className="bg-neutral-800 border-neutral-700"
+                                        className="bg-white border-slate-300 text-slate-900 focus:border-blue-500"
                                         placeholder="Enter company name"
                                     />
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="grid gap-2">
-                                        <Label>Seats Required</Label>
+                                        <Label className="text-slate-700">Seats Required</Label>
                                         <Input
                                             type="number"
                                             value={formData.seatsAllocated}
                                             onChange={(e) => setFormData({ ...formData, seatsAllocated: e.target.value })}
-                                            className="bg-neutral-800 border-neutral-700"
+                                            className="bg-white border-slate-300 text-slate-900"
                                             placeholder="0"
                                         />
                                     </div>
                                     <div className="grid gap-2">
-                                        <Label>Monthly Rent (₹)</Label>
+                                        <Label className="text-slate-700">Monthly Rent (₹)</Label>
                                         <Input
                                             type="number"
                                             value={formData.rent}
                                             onChange={(e) => setFormData({ ...formData, rent: e.target.value })}
-                                            className="bg-neutral-800 border-neutral-700"
+                                            className="bg-white border-slate-300 text-slate-900"
                                             placeholder="0"
                                         />
                                     </div>
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="grid gap-2">
-                                        <Label>Advance (₹)</Label>
+                                        <Label className="text-slate-700">Advance (₹)</Label>
                                         <Input
                                             type="number"
                                             value={formData.advance}
                                             onChange={(e) => setFormData({ ...formData, advance: e.target.value })}
-                                            className="bg-neutral-800 border-neutral-700"
+                                            className="bg-white border-slate-300 text-slate-900"
                                             placeholder="0"
                                         />
                                     </div>
                                     <div className="grid gap-2">
-                                        <Label>Start Date</Label>
+                                        <Label className="text-slate-700">Start Date</Label>
                                         <Input
                                             type="date"
                                             value={formData.startDate}
                                             onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                                            className="bg-neutral-800 border-neutral-700"
+                                            className="bg-white border-slate-300 text-slate-900"
                                         />
                                     </div>
                                 </div>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="grid gap-2">
-                                        <Label>Phone</Label>
+                                        <Label className="text-slate-700">Phone</Label>
                                         <Input
                                             value={formData.phone}
                                             onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                                            className="bg-neutral-800 border-neutral-700"
+                                            className="bg-white border-slate-300 text-slate-900"
                                             placeholder="+91 XXXXX XXXXX"
                                         />
                                     </div>
                                     <div className="grid gap-2">
-                                        <Label>Email</Label>
+                                        <Label className="text-slate-700">Email</Label>
                                         <Input
                                             type="email"
                                             value={formData.email}
                                             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                            className="bg-neutral-800 border-neutral-700"
+                                            className="bg-white border-slate-300 text-slate-900"
                                             placeholder="contact@company.com"
                                         />
                                     </div>
                                 </div>
                                 <div className="grid gap-2">
-                                    <Label>Agreement File</Label>
+                                    <Label className="text-slate-700">Agreement File</Label>
                                     <Input
                                         value={formData.agreementFile}
                                         onChange={(e) => setFormData({ ...formData, agreementFile: e.target.value })}
-                                        className="bg-neutral-800 border-neutral-700"
+                                        className="bg-white border-slate-300 text-slate-900"
                                         placeholder="agreement.pdf (simulated)"
                                     />
                                 </div>
                             </div>
                             <DialogFooter>
-                                <Button variant="outline" onClick={() => setIsAddModalOpen(false)}>
+                                <Button variant="outline" onClick={() => setIsAddModalOpen(false)} className="border-slate-300 text-slate-600 hover:bg-slate-50">
                                     Cancel
                                 </Button>
-                                <Button onClick={handleAddTenant} className="bg-blue-600 hover:bg-blue-700">
+                                <Button onClick={handleAddTenant} className="bg-blue-600 hover:bg-blue-700 text-white">
                                     Add Tenant
                                 </Button>
                             </DialogFooter>
@@ -240,46 +240,46 @@ export function Tenants() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
             >
-                <Card className="bg-neutral-900/50 border-neutral-800">
+                <Card className="bg-white border-slate-200 shadow-sm">
                     <CardContent className="p-0">
                         <Table>
                             <TableHeader>
-                                <TableRow className="border-neutral-800 hover:bg-transparent">
-                                    <TableHead className="text-neutral-400">Company</TableHead>
-                                    <TableHead className="text-neutral-400">Seats</TableHead>
-                                    <TableHead className="text-neutral-400">Rent</TableHead>
-                                    <TableHead className="text-neutral-400">Status</TableHead>
-                                    <TableHead className="text-neutral-400">Contact</TableHead>
-                                    <TableHead className="text-neutral-400 text-right">Actions</TableHead>
+                                <TableRow className="border-slate-200 hover:bg-transparent">
+                                    <TableHead className="text-slate-500 font-medium">Company</TableHead>
+                                    <TableHead className="text-slate-500 font-medium">Seats</TableHead>
+                                    <TableHead className="text-slate-500 font-medium">Rent</TableHead>
+                                    <TableHead className="text-slate-500 font-medium">Status</TableHead>
+                                    <TableHead className="text-slate-500 font-medium">Contact</TableHead>
+                                    <TableHead className="text-slate-500 font-medium text-right">Actions</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
                                 {tenants.length === 0 ? (
-                                    <TableRow className="border-neutral-800">
-                                        <TableCell colSpan={6} className="text-center text-neutral-500 py-8">
+                                    <TableRow className="border-slate-200">
+                                        <TableCell colSpan={6} className="text-center text-slate-400 py-8">
                                             No tenants found for this location
                                         </TableCell>
                                     </TableRow>
                                 ) : (
                                     tenants.map((tenant) => (
-                                        <TableRow key={tenant.id} className="border-neutral-800 hover:bg-neutral-800/30">
-                                            <TableCell className="font-medium text-white">{tenant.name}</TableCell>
-                                            <TableCell className="text-neutral-300">{tenant.seatsAllocated}</TableCell>
-                                            <TableCell className="text-neutral-300">₹{tenant.rent.toLocaleString()}</TableCell>
+                                        <TableRow key={tenant.id} className="border-slate-200 hover:bg-slate-50">
+                                            <TableCell className="font-medium text-slate-900">{tenant.name}</TableCell>
+                                            <TableCell className="text-slate-600">{tenant.seatsAllocated}</TableCell>
+                                            <TableCell className="text-slate-600">₹{tenant.rent.toLocaleString()}</TableCell>
                                             <TableCell>
                                                 <Badge
                                                     variant={tenant.status === 'Active' ? 'default' : 'secondary'}
                                                     className={
                                                         tenant.status === 'Active'
-                                                            ? 'bg-green-600/20 text-green-400 border-green-600/30'
-                                                            : 'bg-neutral-600/20 text-neutral-400'
+                                                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                                            : 'bg-slate-100 text-slate-500'
                                                     }
                                                 >
                                                     {tenant.status}
                                                 </Badge>
                                             </TableCell>
                                             <TableCell>
-                                                <div className="flex items-center gap-2 text-neutral-400">
+                                                <div className="flex items-center gap-2 text-slate-500">
                                                     <IconPhone size={14} />
                                                     <span className="text-sm">{tenant.contact?.phone}</span>
                                                 </div>
@@ -290,7 +290,7 @@ export function Tenants() {
                                                         variant="ghost"
                                                         size="sm"
                                                         onClick={() => handleViewTenant(tenant)}
-                                                        className="text-neutral-400 hover:text-white"
+                                                        className="text-slate-500 hover:text-blue-600 hover:bg-blue-50"
                                                     >
                                                         <IconEye size={16} />
                                                     </Button>
@@ -298,7 +298,7 @@ export function Tenants() {
                                                         <Button
                                                             variant="ghost"
                                                             size="sm"
-                                                            className="text-neutral-400 hover:text-white"
+                                                            className="text-slate-500 hover:text-blue-600 hover:bg-blue-50"
                                                         >
                                                             <IconEdit size={16} />
                                                         </Button>
@@ -316,17 +316,17 @@ export function Tenants() {
 
             {/* Tenant Detail Drawer */}
             <Sheet open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
-                <SheetContent className="bg-neutral-900 border-neutral-800 text-white w-96">
+                <SheetContent className="bg-white border-slate-200 text-slate-900 w-96 shadow-2xl">
                     <SheetHeader>
-                        <SheetTitle className="text-white">{selectedTenant?.name}</SheetTitle>
-                        <SheetDescription className="text-neutral-400">
+                        <SheetTitle className="text-slate-900">{selectedTenant?.name}</SheetTitle>
+                        <SheetDescription className="text-slate-500">
                             Tenant Details
                         </SheetDescription>
                     </SheetHeader>
                     {selectedTenant && (
                         <div className="mt-6 space-y-6">
                             <div>
-                                <h4 className="text-sm font-medium text-neutral-400 mb-2">Status</h4>
+                                <h4 className="text-sm font-medium text-slate-500 mb-2">Status</h4>
                                 {isAdmin ? (
                                     <Select
                                         value={selectedTenant.status}
@@ -335,12 +335,12 @@ export function Tenants() {
                                             setSelectedTenant({ ...selectedTenant, status: value });
                                         }}
                                     >
-                                        <SelectTrigger className="w-full bg-neutral-800 border-neutral-700">
+                                        <SelectTrigger className="w-full bg-white border-slate-300">
                                             <SelectValue />
                                         </SelectTrigger>
-                                        <SelectContent className="bg-neutral-800 border-neutral-700">
-                                            <SelectItem value="Active" className="text-white">Active</SelectItem>
-                                            <SelectItem value="Inactive" className="text-white">Inactive</SelectItem>
+                                        <SelectContent className="bg-white border-slate-200">
+                                            <SelectItem value="Active" className="text-slate-900">Active</SelectItem>
+                                            <SelectItem value="Inactive" className="text-slate-900">Inactive</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 ) : (
@@ -348,7 +348,7 @@ export function Tenants() {
                                         variant={selectedTenant.status === 'Active' ? 'default' : 'secondary'}
                                         className={
                                             selectedTenant.status === 'Active'
-                                                ? 'bg-green-600/20 text-green-400'
+                                                ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
                                                 : ''
                                         }
                                     >
@@ -357,51 +357,51 @@ export function Tenants() {
                                 )}
                             </div>
 
-                            <Separator className="bg-neutral-800" />
+                            <Separator className="bg-slate-200" />
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <h4 className="text-sm font-medium text-neutral-400 mb-1">Seats</h4>
-                                    <p className="text-lg font-semibold text-white">{selectedTenant.seatsAllocated}</p>
+                                    <h4 className="text-sm font-medium text-slate-500 mb-1">Seats</h4>
+                                    <p className="text-lg font-semibold text-slate-900">{selectedTenant.seatsAllocated}</p>
                                 </div>
                                 <div>
-                                    <h4 className="text-sm font-medium text-neutral-400 mb-1">Monthly Rent</h4>
-                                    <p className="text-lg font-semibold text-white">₹{selectedTenant.rent.toLocaleString()}</p>
+                                    <h4 className="text-sm font-medium text-slate-500 mb-1">Monthly Rent</h4>
+                                    <p className="text-lg font-semibold text-slate-900">₹{selectedTenant.rent.toLocaleString()}</p>
                                 </div>
                             </div>
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <h4 className="text-sm font-medium text-neutral-400 mb-1">Advance</h4>
-                                    <p className="text-lg font-semibold text-white">₹{selectedTenant.advance.toLocaleString()}</p>
+                                    <h4 className="text-sm font-medium text-slate-500 mb-1">Advance</h4>
+                                    <p className="text-lg font-semibold text-slate-900">₹{selectedTenant.advance.toLocaleString()}</p>
                                 </div>
                                 <div>
-                                    <h4 className="text-sm font-medium text-neutral-400 mb-1">Start Date</h4>
-                                    <p className="text-lg font-semibold text-white">{selectedTenant.startDate}</p>
+                                    <h4 className="text-sm font-medium text-slate-500 mb-1">Start Date</h4>
+                                    <p className="text-lg font-semibold text-slate-900">{selectedTenant.startDate}</p>
                                 </div>
                             </div>
 
-                            <Separator className="bg-neutral-800" />
+                            <Separator className="bg-slate-200" />
 
                             <div>
-                                <h4 className="text-sm font-medium text-neutral-400 mb-3">Contact</h4>
+                                <h4 className="text-sm font-medium text-slate-500 mb-3">Contact</h4>
                                 <div className="space-y-2">
-                                    <div className="flex items-center gap-2 text-neutral-300">
+                                    <div className="flex items-center gap-2 text-slate-600">
                                         <IconPhone size={16} />
                                         <span>{selectedTenant.contact?.phone}</span>
                                     </div>
-                                    <div className="flex items-center gap-2 text-neutral-300">
+                                    <div className="flex items-center gap-2 text-slate-600">
                                         <IconMail size={16} />
                                         <span>{selectedTenant.contact?.email}</span>
                                     </div>
                                 </div>
                             </div>
 
-                            <Separator className="bg-neutral-800" />
+                            <Separator className="bg-slate-200" />
 
                             <div>
-                                <h4 className="text-sm font-medium text-neutral-400 mb-2">Agreement</h4>
-                                <div className="flex items-center gap-2 text-blue-400">
+                                <h4 className="text-sm font-medium text-slate-500 mb-2">Agreement</h4>
+                                <div className="flex items-center gap-2 text-blue-600">
                                     <IconFile size={16} />
                                     <span className="text-sm">{selectedTenant.agreementFile}</span>
                                 </div>

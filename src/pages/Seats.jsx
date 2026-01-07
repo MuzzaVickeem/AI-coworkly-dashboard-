@@ -39,9 +39,9 @@ function useAnimatedValue(targetValue, duration = 500) {
 
 // Utilization status helper
 function getUtilizationStatus(percentage) {
-    if (percentage < 40) return { label: 'Underutilized', color: 'text-yellow-400', bgColor: 'bg-yellow-500' };
-    if (percentage <= 75) return { label: 'Healthy', color: 'text-green-400', bgColor: 'bg-green-500' };
-    return { label: 'High Demand', color: 'text-orange-400', bgColor: 'bg-orange-500' };
+    if (percentage < 40) return { label: 'Underutilized', color: 'text-amber-600', bgColor: 'bg-amber-500' };
+    if (percentage <= 75) return { label: 'Healthy', color: 'text-emerald-600', bgColor: 'bg-emerald-500' };
+    return { label: 'High Demand', color: 'text-orange-600', bgColor: 'bg-orange-500' };
 }
 
 export function Seats() {
@@ -65,14 +65,14 @@ export function Seats() {
     const animatedUtilization = useAnimatedValue(utilization);
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-8">
             {/* Page Header */}
             <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
             >
-                <h1 className="text-2xl font-bold text-white mb-1">Room Overview</h1>
-                <p className="text-neutral-400">{selectedLocation?.name}</p>
+                <h1 className="text-3xl font-bold text-slate-900 mb-1 tracking-tight">Room Overview</h1>
+                <p className="text-slate-500">{selectedLocation?.name}</p>
             </motion.div>
 
             {/* Room Summary Cards - 4 columns */}
@@ -80,68 +80,68 @@ export function Seats() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
-                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5"
             >
                 {/* Total Rooms */}
-                <Card className="bg-gradient-to-br from-blue-500/20 to-blue-600/5 border-blue-500/30">
+                <Card className="bg-white border-slate-200 shadow-sm hover:shadow-md hover:border-blue-200 transition-all">
                     <CardContent className="p-6">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-sm text-neutral-400 mb-1">Total Rooms</p>
-                                <p className="text-3xl font-bold text-white">{animatedTotal}</p>
+                                <p className="text-sm text-slate-500 mb-1">Total Rooms</p>
+                                <p className="text-3xl font-bold text-blue-600">{animatedTotal}</p>
                             </div>
-                            <div className="p-3 rounded-xl bg-blue-500/20">
-                                <IconBuildingSkyscraper size={24} className="text-blue-400" />
+                            <div className="p-3 rounded-xl bg-blue-50">
+                                <IconBuildingSkyscraper size={24} className="text-blue-600" />
                             </div>
                         </div>
                     </CardContent>
                 </Card>
 
                 {/* Occupied Rooms */}
-                <Card className="bg-gradient-to-br from-red-500/20 to-red-600/5 border-red-500/30">
+                <Card className="bg-white border-slate-200 shadow-sm hover:shadow-md hover:border-red-200 transition-all">
                     <CardContent className="p-6">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-sm text-neutral-400 mb-1">Occupied Rooms</p>
-                                <p className="text-3xl font-bold text-white">{animatedOccupied}</p>
+                                <p className="text-sm text-slate-500 mb-1">Occupied Rooms</p>
+                                <p className="text-3xl font-bold text-red-600">{animatedOccupied}</p>
                             </div>
-                            <div className="p-3 rounded-xl bg-red-500/20">
-                                <IconBuilding size={24} className="text-red-400" />
+                            <div className="p-3 rounded-xl bg-red-50">
+                                <IconBuilding size={24} className="text-red-600" />
                             </div>
                         </div>
                     </CardContent>
                 </Card>
 
                 {/* Available Rooms - Highlighted */}
-                <Card className="bg-gradient-to-br from-green-500/20 to-green-600/5 border-green-500/30 ring-1 ring-green-500/20">
+                <Card className="bg-white border-emerald-200 shadow-sm ring-1 ring-emerald-100 hover:shadow-md transition-all">
                     <CardContent className="p-6">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-sm text-green-300 mb-1">Available Now</p>
-                                <p className="text-3xl font-bold text-white">{animatedAvailable}</p>
+                                <p className="text-sm text-emerald-600 mb-1 font-medium">Available Now</p>
+                                <p className="text-3xl font-bold text-emerald-600">{animatedAvailable}</p>
                             </div>
-                            <div className="p-3 rounded-xl bg-green-500/20">
-                                <IconDoor size={24} className="text-green-400" />
+                            <div className="p-3 rounded-xl bg-emerald-50">
+                                <IconDoor size={24} className="text-emerald-600" />
                             </div>
                         </div>
                     </CardContent>
                 </Card>
 
-                {/* Utilization Card - NEW */}
-                <Card className="bg-gradient-to-br from-purple-500/20 to-purple-600/5 border-purple-500/30">
+                {/* Utilization Card */}
+                <Card className="bg-white border-slate-200 shadow-sm hover:shadow-md hover:border-violet-200 transition-all">
                     <CardContent className="p-6">
                         <div className="flex items-center justify-between mb-3">
                             <div>
-                                <p className="text-sm text-neutral-400 mb-1">Utilization</p>
-                                <p className="text-3xl font-bold text-white">{animatedUtilization}%</p>
+                                <p className="text-sm text-slate-500 mb-1">Utilization</p>
+                                <p className="text-3xl font-bold text-violet-600">{animatedUtilization}%</p>
                             </div>
-                            <div className="p-3 rounded-xl bg-purple-500/20">
-                                <IconChartPie size={24} className="text-purple-400" />
+                            <div className="p-3 rounded-xl bg-violet-50">
+                                <IconChartPie size={24} className="text-violet-600" />
                             </div>
                         </div>
                         {/* Progress Bar */}
                         <div className="space-y-2">
-                            <div className="h-2 bg-neutral-800 rounded-full overflow-hidden">
+                            <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
                                 <motion.div
                                     className={`h-full ${utilizationStatus.bgColor} rounded-full`}
                                     initial={{ width: 0 }}
@@ -162,14 +162,14 @@ export function Seats() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.3 }}
-                className="bg-neutral-800/30 border border-neutral-700/50 rounded-lg px-4 py-3"
+                className="bg-blue-50/50 border border-blue-100 rounded-xl px-5 py-4"
             >
-                <p className="text-sm text-neutral-300">
-                    <span className="font-medium text-white">{selectedLocation?.name}</span>
+                <p className="text-sm text-slate-600">
+                    <span className="font-semibold text-slate-900">{selectedLocation?.name}</span>
                     {' '}is operating at{' '}
                     <span className={`font-semibold ${utilizationStatus.color}`}>{utilization}%</span>
                     {' '}capacity with{' '}
-                    <span className="font-semibold text-green-400">{availableRooms} room{availableRooms !== 1 ? 's' : ''}</span>
+                    <span className="font-semibold text-emerald-600">{availableRooms} room{availableRooms !== 1 ? 's' : ''}</span>
                     {' '}available.
                 </p>
             </motion.div>

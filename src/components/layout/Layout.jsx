@@ -8,11 +8,8 @@ export function Layout() {
     const location = useRouterLocation();
     const [sidebarWidth, setSidebarWidth] = useState(256);
 
-    // Listen for sidebar width changes via CSS custom property or state
-    // For now, we'll handle this with a static margin that matches the sidebar
-
     return (
-        <div className="min-h-screen bg-neutral-950">
+        <div className="min-h-screen bg-[#FAFAFA]">
             <Sidebar />
 
             {/* Main content area with left margin for sidebar */}
@@ -20,7 +17,7 @@ export function Layout() {
                 <Header />
 
                 {/* Page content with animations */}
-                <main className="p-6">
+                <main className="p-8 max-w-[1600px]">
                     <AnimatePresence mode="wait">
                         <motion.div
                             key={location.pathname}

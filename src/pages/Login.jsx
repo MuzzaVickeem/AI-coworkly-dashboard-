@@ -38,9 +38,9 @@ export function Login() {
     };
 
     return (
-        <div className="min-h-screen bg-neutral-950 flex items-center justify-center p-4">
-            {/* Background gradient */}
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-900/20 via-neutral-950 to-purple-900/20" />
+        <div className="min-h-screen bg-[#FAFAFA] flex items-center justify-center p-4">
+            {/* Subtle background */}
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-[#FAFAFA] to-slate-100" />
 
             <motion.div
                 initial={{ opacity: 0, scale: 0.9, y: 20 }}
@@ -48,21 +48,21 @@ export function Login() {
                 transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
                 className="relative z-10 w-full max-w-md"
             >
-                <Card className="bg-neutral-900/80 backdrop-blur-xl border-neutral-800 shadow-2xl">
+                <Card className="bg-white border-slate-200 shadow-2xl">
                     <CardHeader className="text-center pb-2">
                         {/* Logo */}
                         <motion.div
                             initial={{ scale: 0 }}
                             animate={{ scale: 1 }}
                             transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
-                            className="mx-auto mb-4 w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-500/25"
+                            className="mx-auto mb-4 w-16 h-16 rounded-2xl bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-600/25"
                         >
                             <IconArmchair2 size={32} className="text-white" />
                         </motion.div>
-                        <CardTitle className="text-2xl font-bold text-white">
+                        <CardTitle className="text-2xl font-bold text-slate-900">
                             CoWork Operations
                         </CardTitle>
-                        <CardDescription className="text-neutral-400">
+                        <CardDescription className="text-slate-500">
                             Sign in to access the dashboard
                         </CardDescription>
                     </CardHeader>
@@ -70,17 +70,17 @@ export function Login() {
                     <CardContent className="pt-4">
                         {/* Login Type Tabs */}
                         <Tabs value={loginType} onValueChange={setLoginType} className="mb-6">
-                            <TabsList className="grid w-full grid-cols-2 bg-neutral-800">
+                            <TabsList className="grid w-full grid-cols-2 bg-slate-100">
                                 <TabsTrigger
                                     value="admin"
-                                    className="data-[state=active]:bg-blue-600 data-[state=active]:text-white flex items-center gap-2"
+                                    className="data-[state=active]:bg-blue-600 data-[state=active]:text-white text-slate-600 flex items-center gap-2"
                                 >
                                     <IconShieldCheck size={16} />
                                     Admin
                                 </TabsTrigger>
                                 <TabsTrigger
                                     value="director"
-                                    className="data-[state=active]:bg-purple-600 data-[state=active]:text-white flex items-center gap-2"
+                                    className="data-[state=active]:bg-violet-600 data-[state=active]:text-white text-slate-600 flex items-center gap-2"
                                 >
                                     <IconEye size={16} />
                                     Director
@@ -92,28 +92,28 @@ export function Login() {
                                 key={loginType}
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
-                                className="mt-4 p-3 rounded-lg bg-neutral-800/50 border border-neutral-700"
+                                className="mt-4 p-3 rounded-lg bg-slate-50 border border-slate-200"
                             >
                                 {loginType === 'admin' ? (
                                     <div className="flex items-start gap-3">
-                                        <div className="p-2 rounded-lg bg-blue-500/20">
-                                            <IconShieldCheck size={18} className="text-blue-400" />
+                                        <div className="p-2 rounded-lg bg-blue-50">
+                                            <IconShieldCheck size={18} className="text-blue-600" />
                                         </div>
                                         <div>
-                                            <p className="text-sm font-medium text-white">Full Access</p>
-                                            <p className="text-xs text-neutral-400 mt-0.5">
+                                            <p className="text-sm font-medium text-slate-900">Full Access</p>
+                                            <p className="text-xs text-slate-500 mt-0.5">
                                                 Manage tenants, mark attendance, edit data
                                             </p>
                                         </div>
                                     </div>
                                 ) : (
                                     <div className="flex items-start gap-3">
-                                        <div className="p-2 rounded-lg bg-purple-500/20">
-                                            <IconEye size={18} className="text-purple-400" />
+                                        <div className="p-2 rounded-lg bg-violet-50">
+                                            <IconEye size={18} className="text-violet-600" />
                                         </div>
                                         <div>
-                                            <p className="text-sm font-medium text-white">View Only</p>
-                                            <p className="text-xs text-neutral-400 mt-0.5">
+                                            <p className="text-sm font-medium text-slate-900">View Only</p>
+                                            <p className="text-xs text-slate-500 mt-0.5">
                                                 Read-only access to dashboards and reports
                                             </p>
                                         </div>
@@ -129,13 +129,13 @@ export function Login() {
                                 transition={{ delay: 0.3 }}
                                 className="space-y-2"
                             >
-                                <Label htmlFor="email" className="text-neutral-300">
+                                <Label htmlFor="email" className="text-slate-700">
                                     Email Address
                                 </Label>
                                 <div className="relative">
                                     <IconMail
                                         size={18}
-                                        className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500"
+                                        className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
                                     />
                                     <Input
                                         id="email"
@@ -143,7 +143,7 @@ export function Login() {
                                         placeholder={loginType === 'admin' ? 'admin@cowork.com' : 'director@company.com'}
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
-                                        className="pl-10 bg-neutral-800 border-neutral-700 text-white placeholder:text-neutral-500"
+                                        className="pl-10 bg-white border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-blue-500"
                                         required
                                     />
                                 </div>
@@ -155,13 +155,13 @@ export function Login() {
                                 transition={{ delay: 0.4 }}
                                 className="space-y-2"
                             >
-                                <Label htmlFor="password" className="text-neutral-300">
+                                <Label htmlFor="password" className="text-slate-700">
                                     Password
                                 </Label>
                                 <div className="relative">
                                     <IconLock
                                         size={18}
-                                        className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500"
+                                        className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
                                     />
                                     <Input
                                         id="password"
@@ -169,7 +169,7 @@ export function Login() {
                                         placeholder="••••••••"
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
-                                        className="pl-10 bg-neutral-800 border-neutral-700 text-white placeholder:text-neutral-500"
+                                        className="pl-10 bg-white border-slate-300 text-slate-900 placeholder:text-slate-400 focus:border-blue-500"
                                         required
                                     />
                                 </div>
@@ -185,9 +185,9 @@ export function Login() {
                                     type="submit"
                                     disabled={isLoading}
                                     className={`w-full font-medium h-11 transition-all duration-200 ${loginType === 'admin'
-                                        ? 'bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400'
-                                        : 'bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400'
-                                        } text-white`}
+                                        ? 'bg-blue-600 hover:bg-blue-700'
+                                        : 'bg-violet-600 hover:bg-violet-700'
+                                        } text-white shadow-md`}
                                 >
                                     <motion.span
                                         whileHover={{ scale: 1.02 }}
@@ -204,7 +204,7 @@ export function Login() {
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 transition={{ delay: 0.6 }}
-                                className="text-center text-xs text-neutral-500 pt-2"
+                                className="text-center text-xs text-slate-400 pt-2"
                             >
                                 Demo mode — any email/password works
                             </motion.p>

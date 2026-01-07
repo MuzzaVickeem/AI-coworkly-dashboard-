@@ -55,19 +55,27 @@ export function KPICard({
     const animatedValue = useCountUp(value, 600);
 
     const colorClasses = {
-        blue: 'from-blue-500/20 to-blue-600/5 border-blue-500/30',
-        green: 'from-green-500/20 to-green-600/5 border-green-500/30',
-        purple: 'from-purple-500/20 to-purple-600/5 border-purple-500/30',
-        amber: 'from-amber-500/20 to-amber-600/5 border-amber-500/30',
-        red: 'from-red-500/20 to-red-600/5 border-red-500/30',
+        blue: 'bg-white border-slate-200 hover:border-blue-200 hover:shadow-blue-100/50',
+        green: 'bg-white border-slate-200 hover:border-emerald-200 hover:shadow-emerald-100/50',
+        purple: 'bg-white border-slate-200 hover:border-violet-200 hover:shadow-violet-100/50',
+        amber: 'bg-white border-slate-200 hover:border-amber-200 hover:shadow-amber-100/50',
+        red: 'bg-white border-slate-200 hover:border-red-200 hover:shadow-red-100/50',
     };
 
     const iconColorClasses = {
-        blue: 'text-blue-400 bg-blue-500/20',
-        green: 'text-green-400 bg-green-500/20',
-        purple: 'text-purple-400 bg-purple-500/20',
-        amber: 'text-amber-400 bg-amber-500/20',
-        red: 'text-red-400 bg-red-500/20',
+        blue: 'text-blue-600 bg-blue-50',
+        green: 'text-emerald-600 bg-emerald-50',
+        purple: 'text-violet-600 bg-violet-50',
+        amber: 'text-amber-600 bg-amber-50',
+        red: 'text-red-600 bg-red-50',
+    };
+
+    const accentColors = {
+        blue: 'text-blue-600',
+        green: 'text-emerald-600',
+        purple: 'text-violet-600',
+        amber: 'text-amber-600',
+        red: 'text-red-600',
     };
 
     return (
@@ -86,16 +94,16 @@ export function KPICard({
         >
             <Card
                 className={cn(
-                    'bg-gradient-to-br border backdrop-blur-sm transition-all duration-300',
-                    'hover:shadow-xl hover:shadow-black/25 hover:brightness-110',
+                    'border rounded-xl transition-all duration-300',
+                    'hover:shadow-lg',
                     colorClasses[color]
                 )}
             >
                 <CardContent className="p-6">
                     <div className="flex items-start justify-between">
                         <div className="flex-1">
-                            <p className="text-sm font-medium text-neutral-400 mb-2">{title}</p>
-                            <p className="text-3xl font-bold text-white tracking-tight">
+                            <p className="text-sm font-medium text-slate-500 mb-2">{title}</p>
+                            <p className={cn('text-3xl font-bold tracking-tight', accentColors[color])}>
                                 {prefix}
                                 {animatedValue.toLocaleString()}
                                 {suffix}
@@ -105,14 +113,14 @@ export function KPICard({
                                     <span
                                         className={cn(
                                             'text-xs font-medium',
-                                            trend >= 0 ? 'text-green-400' : 'text-red-400'
+                                            trend >= 0 ? 'text-emerald-600' : 'text-red-600'
                                         )}
                                     >
                                         {trend >= 0 ? '+' : ''}
                                         {trend}%
                                     </span>
                                     {trendLabel && (
-                                        <span className="text-xs text-neutral-500">{trendLabel}</span>
+                                        <span className="text-xs text-slate-400">{trendLabel}</span>
                                     )}
                                 </div>
                             )}

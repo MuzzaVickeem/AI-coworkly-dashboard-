@@ -39,33 +39,33 @@ export function TenantDistribution() {
         stack: true,
         scale: {
             color: {
-                range: ['#8b5cf6', '#6b7280'],
+                range: ['#8B5CF6', '#CBD5E1'],
             },
         },
         axis: {
             x: {
                 title: false,
                 labelFontSize: 12,
-                labelFill: '#a3a3a3',
-                grid: { line: { style: { stroke: '#303030' } } },
+                labelFill: '#64748B',
+                grid: { line: { style: { stroke: '#F1F5F9' } } },
             },
             y: {
                 title: false,
                 labelFontSize: 12,
-                labelFill: '#a3a3a3',
-                line: { style: { stroke: '#404040' } },
+                labelFill: '#64748B',
+                line: { style: { stroke: '#E2E8F0' } },
             },
         },
         legend: {
             color: {
                 position: 'top-right',
-                itemLabelFill: '#a3a3a3',
+                itemLabelFill: '#64748B',
                 itemLabelFontSize: 12,
             },
         },
         style: {
-            radiusTopRight: 4,
-            radiusBottomRight: 4,
+            radiusTopRight: 6,
+            radiusBottomRight: 6,
         },
         animate: {
             enter: { type: 'growInX', duration: 600 },
@@ -81,9 +81,9 @@ export function TenantDistribution() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.64, ease: [0.25, 0.46, 0.45, 0.94] }}
         >
-            <Card className="bg-neutral-900/50 border-neutral-800">
+            <Card className="bg-white border-slate-200 shadow-sm">
                 <CardHeader className="pb-2">
-                    <CardTitle className="text-lg font-semibold text-white">Tenant Distribution</CardTitle>
+                    <CardTitle className="text-lg font-semibold text-slate-900">Tenant Distribution</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <div className="h-64">

@@ -1,110 +1,74 @@
-import { Armchair } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { motion } from 'framer-motion';
+import { IconArmchair2, IconCheck } from '@tabler/icons-react';
 
 /**
- * Theatre-style selectable seat grid for ITS Bay rooms
- * STRICT CSS GRID: 5 columns, fixed 44px cells, perfect alignment
+ * Selectable seat grid for booking dialog
  */
-export function SelectableSeatGrid({
-    capacity,
-    selectedSeats = [],
-    onSeatToggle,
-    bookedSeats = []
-}) {
-    const COLS = 5;
-    const CELL_SIZE = 44; // Fixed cell size in pixels
-    const GAP = 8; // Gap between cells
-    const gridWidth = COLS * CELL_SIZE + (COLS - 1) * GAP;
+export function SelectableSeatGrid({ capacity, selectedSeats = [], onSeatToggle, bookedSeats = [] }) {
+    // Calculate grid dimensions - aim for roughly square layout
+    const cols = capacity <= 4 ? 2 : capacity <= 6 ? 3 : capacity <= 9 ? 3 : capacity <= 12 ? 4 : 5;
 
-    const seats = Array.from({ length: capacity }, (_, i) => i);
-
-    const getSeatState = (seatIndex) => {
-        if (bookedSeats.includes(seatIndex)) return 'unavailable';
-        if (selectedSeats.includes(seatIndex)) return 'selected';
-        return 'available';
-    };
-
-    const handleSeatClick = (seatIndex) => {
-        if (bookedSeats.includes(seatIndex)) return;
-        onSeatToggle(seatIndex);
-    };
+    const isSeatBooked = (index) => bookedSeats.includes(index);
+    const isSeatSelected = (index) => selectedSeats.includes(index);
 
     return (
-        <div className="flex flex-col items-center">
-            {/* FRONT label - centered, same width as grid */}
+        <div className="flex flex-col items-center gap-4 w-full">
+            {/* Grid of seats */}
             <div
-                className="py-2 mb-4 bg-neutral-700/60 rounded-md text-center text-[11px] text-neutral-300 uppercase tracking-widest font-medium"
-                style={{ width: gridWidth }}
-            >
-                Front
-            </div>
-
-            {/* Seat Grid - STRICT CSS GRID */}
-            <div
-                className="grid"
+                className="grid gap-2"
                 style={{
-                    gridTemplateColumns: `repeat(${COLS}, ${CELL_SIZE}px)`,
-                    gap: `${GAP}px`,
-                    width: gridWidth
+                    gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
                 }}
             >
-                {seats.map((seatIndex) => {
-                    const state = getSeatState(seatIndex);
+                {Array.from({ length: capacity }).map((_, index) => {
+                    const isBooked = isSeatBooked(index);
+                    const isSelected = isSeatSelected(index);
+
                     return (
-                        <motion.button
-                            key={seatIndex}
-                            whileHover={state !== 'unavailable' ? { scale: 1.08 } : {}}
-                            whileTap={state !== 'unavailable' ? { scale: 0.95 } : {}}
-                            onClick={() => handleSeatClick(seatIndex)}
-                            disabled={state === 'unavailable'}
-                            style={{ width: CELL_SIZE, height: CELL_SIZE }}
+                        <button
+                            key={index}
+                            onClick={() => !isBooked && onSeatToggle(index)}
+                            disabled={isBooked}
                             className={cn(
-                                "flex flex-col items-center justify-center rounded-md border-2 transition-all duration-150",
-                                state === 'available' && "bg-neutral-800 border-neutral-600 hover:border-blue-400 hover:bg-blue-900/40 cursor-pointer",
-                                state === 'selected' && "bg-blue-600 border-blue-400 text-white cursor-pointer shadow-lg shadow-blue-500/40",
-                                state === 'unavailable' && "bg-red-900/40 border-red-700/50 cursor-not-allowed"
+                                'w-10 h-10 rounded-lg flex items-center justify-center',
+                                'transition-all duration-200 relative',
+                                isBooked && 'bg-slate-100 border border-slate-200 text-slate-300 cursor-not-allowed',
+                                !isBooked && !isSelected && 'bg-blue-50 border border-blue-200 text-blue-400 hover:bg-blue-100 hover:border-blue-300 cursor-pointer',
+                                isSelected && 'bg-blue-600 border border-blue-600 text-white cursor-pointer shadow-md shadow-blue-200'
                             )}
                         >
-                            <Armchair
-                                className={cn(
-                                    "w-5 h-5",
-                                    state === 'available' && "text-neutral-400",
-                                    state === 'selected' && "text-white",
-                                    state === 'unavailable' && "text-red-400/60"
-                                )}
-                            />
-                            <span className={cn(
-                                "text-[9px] font-medium mt-0.5",
-                                state === 'available' && "text-neutral-500",
-                                state === 'selected' && "text-white",
-                                state === 'unavailable' && "text-red-400/60"
-                            )}>
-                                {seatIndex + 1}
-                            </span>
-                        </motion.button>
+                            {isSelected ? (
+                                <IconCheck size={18} strokeWidth={3} />
+                            ) : (
+                                <IconArmchair2 size={18} />
+                            )}
+                        </button>
                     );
                 })}
             </div>
 
-            {/* Legend - centered below grid */}
-            <div
-                className="flex items-center justify-center gap-6 mt-4 pt-4 border-t border-neutral-700"
-                style={{ width: gridWidth }}
-            >
-                <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 rounded bg-neutral-800 border-2 border-neutral-600"></div>
-                    <span className="text-xs text-neutral-400">Available</span>
+            {/* Legend */}
+            <div className="flex items-center gap-4 text-xs text-slate-500 mt-2">
+                <div className="flex items-center gap-1.5">
+                    <div className="w-3 h-3 rounded bg-blue-50 border border-blue-200" />
+                    <span>Available</span>
                 </div>
-                <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 rounded bg-blue-600 border-2 border-blue-400"></div>
-                    <span className="text-xs text-neutral-400">Selected</span>
+                <div className="flex items-center gap-1.5">
+                    <div className="w-3 h-3 rounded bg-blue-600" />
+                    <span>Selected</span>
                 </div>
-                <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 rounded bg-red-900/40 border-2 border-red-700/50"></div>
-                    <span className="text-xs text-neutral-400">Booked</span>
+                <div className="flex items-center gap-1.5">
+                    <div className="w-3 h-3 rounded bg-slate-100 border border-slate-200" />
+                    <span>Booked</span>
                 </div>
             </div>
+
+            {/* Selection count */}
+            {selectedSeats.length > 0 && (
+                <div className="text-sm font-medium text-blue-600">
+                    {selectedSeats.length} seat{selectedSeats.length > 1 ? 's' : ''} selected
+                </div>
+            )}
         </div>
     );
 }

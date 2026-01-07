@@ -86,12 +86,12 @@ function BookingDialog({ room, onClose, onProceedToTenant }) {
 
     return (
         <DialogContent
-            className="bg-neutral-900 border-neutral-800 text-white p-0 overflow-hidden"
+            className="bg-white border-slate-200 text-slate-900 p-0 overflow-hidden shadow-2xl"
             style={{ maxWidth: '960px', width: '95vw' }}
         >
-            <DialogHeader className="px-8 pt-8 pb-6 border-b border-neutral-800">
-                <DialogTitle className="text-2xl font-bold">{room.name}</DialogTitle>
-                <DialogDescription className="text-neutral-400 text-sm mt-1">
+            <DialogHeader className="px-8 pt-8 pb-6 border-b border-slate-100">
+                <DialogTitle className="text-2xl font-bold text-slate-900">{room.name}</DialogTitle>
+                <DialogDescription className="text-slate-500 text-sm mt-1">
                     {room.allowSeatSelection
                         ? 'Select your preferred seats and booking dates.'
                         : 'Book the entire room for your team.'
@@ -102,10 +102,10 @@ function BookingDialog({ room, onClose, onProceedToTenant }) {
             <div className="grid p-8" style={{ gridTemplateColumns: '1fr 1fr', gap: '48px' }}>
                 {/* Left Column: Seat Grid */}
                 <div className="flex flex-col">
-                    <h4 className="text-xs font-bold text-neutral-400 uppercase tracking-wider mb-5">
+                    <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-5">
                         {room.allowSeatSelection ? 'Select Seats' : 'Room Layout'}
                     </h4>
-                    <div className="flex-1 flex items-start justify-center bg-neutral-800/40 rounded-xl border border-neutral-700 p-6">
+                    <div className="flex-1 flex items-start justify-center bg-slate-50 rounded-xl border border-slate-200 p-6">
                         {room.allowSeatSelection ? (
                             <SelectableSeatGrid
                                 capacity={room.capacity}
@@ -121,50 +121,48 @@ function BookingDialog({ room, onClose, onProceedToTenant }) {
 
                 {/* Right Column: Booking Details */}
                 <div className="flex flex-col">
-                    <h4 className="text-xs font-bold text-neutral-400 uppercase tracking-wider mb-5">
+                    <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-5">
                         Booking Period
                     </h4>
 
                     <div className="grid mb-8" style={{ gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                         <div>
-                            <label className="block text-xs text-neutral-500 mb-2 font-medium">Start Date</label>
+                            <label className="block text-xs text-slate-500 mb-2 font-medium">Start Date</label>
                             <input
                                 type="date"
                                 value={startDate}
                                 onChange={(e) => setStartDate(e.target.value)}
                                 min={today}
-                                className="w-full h-12 bg-neutral-800 border border-neutral-600 rounded-lg px-4 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                style={{ colorScheme: 'dark' }}
+                                className="w-full h-12 bg-white border border-slate-300 rounded-lg px-4 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             />
                         </div>
                         <div>
-                            <label className="block text-xs text-neutral-500 mb-2 font-medium">End Date</label>
+                            <label className="block text-xs text-slate-500 mb-2 font-medium">End Date</label>
                             <input
                                 type="date"
                                 value={endDate}
                                 onChange={(e) => setEndDate(e.target.value)}
                                 min={startDate}
-                                className="w-full h-12 bg-neutral-800 border border-neutral-600 rounded-lg px-4 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                style={{ colorScheme: 'dark' }}
+                                className="w-full h-12 bg-white border border-slate-300 rounded-lg px-4 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             />
                         </div>
                     </div>
 
-                    <h4 className="text-xs font-bold text-neutral-400 uppercase tracking-wider mb-5">
+                    <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-5">
                         Booking Summary
                     </h4>
 
-                    <div className="bg-neutral-800/60 rounded-xl border border-neutral-700 p-5 flex-1">
+                    <div className="bg-slate-50 rounded-xl border border-slate-200 p-5 flex-1">
                         <table className="w-full">
                             <tbody className="text-sm">
                                 <tr>
-                                    <td className="py-2 text-neutral-400 w-28">Room</td>
-                                    <td className="py-2 text-white text-right font-medium">{room.name}</td>
+                                    <td className="py-2 text-slate-500 w-28">Room</td>
+                                    <td className="py-2 text-slate-900 text-right font-medium">{room.name}</td>
                                 </tr>
                                 {room.allowSeatSelection && (
                                     <tr>
-                                        <td className="py-2 text-neutral-400">Seats</td>
-                                        <td className="py-2 text-white text-right font-medium">
+                                        <td className="py-2 text-slate-500">Seats</td>
+                                        <td className="py-2 text-slate-900 text-right font-medium">
                                             {selectedSeats.length > 0
                                                 ? selectedSeats.map(s => s + 1).sort((a, b) => a - b).join(', ')
                                                 : '—'
@@ -173,23 +171,23 @@ function BookingDialog({ room, onClose, onProceedToTenant }) {
                                     </tr>
                                 )}
                                 <tr>
-                                    <td className="py-2 text-neutral-400">Duration</td>
-                                    <td className="py-2 text-white text-right font-medium">
+                                    <td className="py-2 text-slate-500">Duration</td>
+                                    <td className="py-2 text-slate-900 text-right font-medium">
                                         {totalDays > 0 ? `${totalDays} day${totalDays > 1 ? 's' : ''}` : '—'}
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td className="py-2 text-neutral-400">Dates</td>
-                                    <td className="py-2 text-white text-right font-medium">
+                                    <td className="py-2 text-slate-500">Dates</td>
+                                    <td className="py-2 text-slate-900 text-right font-medium">
                                         {formatDateShort(startDate)} → {formatDateShort(endDate)}
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
 
-                        <div className="border-t border-neutral-700 mt-4 pt-4 flex justify-between items-center">
-                            <span className="text-sm text-white font-bold">Total Price</span>
-                            <span className="text-2xl font-bold text-green-400">
+                        <div className="border-t border-slate-200 mt-4 pt-4 flex justify-between items-center">
+                            <span className="text-sm text-slate-900 font-bold">Total Price</span>
+                            <span className="text-2xl font-bold text-emerald-600">
                                 {formatPrice(totalPrice)}
                             </span>
                         </div>
@@ -198,13 +196,13 @@ function BookingDialog({ room, onClose, onProceedToTenant }) {
                     <div className="flex justify-end gap-4 mt-8">
                         <Button
                             variant="outline"
-                            className="h-12 px-8 border-neutral-600 text-neutral-300 hover:bg-neutral-800 hover:text-white"
+                            className="h-12 px-8 border-slate-300 text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                             onClick={onClose}
                         >
                             Cancel
                         </Button>
                         <Button
-                            className="h-12 px-8 bg-blue-600 hover:bg-blue-500 text-white font-semibold"
+                            className="h-12 px-8 bg-blue-600 hover:bg-blue-700 text-white font-semibold"
                             disabled={!canProceed}
                             onClick={handleProceed}
                         >
@@ -224,7 +222,7 @@ function SuccessToast({ message }) {
             initial={{ opacity: 0, y: -30, x: '-50%' }}
             animate={{ opacity: 1, y: 0, x: '-50%' }}
             exit={{ opacity: 0, y: -30, x: '-50%' }}
-            className="fixed top-8 left-1/2 z-50 flex items-center gap-3 px-6 py-4 bg-green-600 text-white rounded-xl shadow-2xl"
+            className="fixed top-8 left-1/2 z-50 flex items-center gap-3 px-6 py-4 bg-emerald-600 text-white rounded-xl shadow-2xl"
         >
             <IconCheck size={22} strokeWidth={3} />
             <span className="font-semibold text-base">{message}</span>
@@ -289,7 +287,7 @@ export function RoomBookingSection() {
     };
 
     return (
-        <section className="space-y-6 pt-8 border-t border-neutral-800">
+        <section className="space-y-6 pt-8 border-t border-slate-200">
             <AnimatePresence>
                 {successMessage && <SuccessToast message={successMessage} />}
             </AnimatePresence>
@@ -307,8 +305,8 @@ export function RoomBookingSection() {
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
             >
-                <h2 className="text-xl font-bold text-white mb-2">Room Booking – {selectedLocation?.name || 'Select Location'}</h2>
-                <p className="text-neutral-400 text-sm">Select a room to view details and book.</p>
+                <h2 className="text-xl font-bold text-slate-900 mb-2">Room Booking – {selectedLocation?.name || 'Select Location'}</h2>
+                <p className="text-slate-500 text-sm">Select a room to view details and book.</p>
             </motion.div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -320,10 +318,10 @@ export function RoomBookingSection() {
                             key={room.id}
                             ref={(el) => cardRefs.current[room.id] = el}
                             className={cn(
-                                "bg-neutral-900/50 border-neutral-800 overflow-hidden transition-all duration-300 flex flex-col p-0",
+                                "bg-white border-slate-200 overflow-hidden transition-all duration-300 flex flex-col p-0 shadow-sm hover:shadow-lg",
                                 isHighlighted
-                                    ? "ring-2 ring-green-500 ring-offset-2 ring-offset-neutral-950 shadow-lg shadow-green-500/20"
-                                    : "hover:border-neutral-700"
+                                    ? "ring-2 ring-emerald-500 ring-offset-2 shadow-lg shadow-emerald-100"
+                                    : "hover:border-slate-300"
                             )}
                         >
                             <div className="relative">
@@ -333,20 +331,20 @@ export function RoomBookingSection() {
                                     className="aspect-video object-cover w-full"
                                 />
                                 {room.isOccupied && (
-                                    <Badge className="absolute top-2 right-2 bg-red-600 text-white border-0">
+                                    <Badge className="absolute top-2 right-2 bg-red-500 text-white border-0">
                                         Occupied
                                     </Badge>
                                 )}
                             </div>
 
                             <CardHeader className="px-4 pt-4 pb-2">
-                                <CardTitle className="text-lg font-semibold text-white text-left">{room.name}</CardTitle>
+                                <CardTitle className="text-lg font-semibold text-slate-900 text-left">{room.name}</CardTitle>
                             </CardHeader>
 
                             <CardContent className="px-4 pb-4 flex flex-col gap-4 flex-1">
                                 <div className="flex items-center justify-between text-sm">
-                                    <span className="text-neutral-400">{room.capacity} seats</span>
-                                    <span className="text-neutral-300 font-medium">{formatPrice(room.pricePerDay)}/day</span>
+                                    <span className="text-slate-500">{room.capacity} seats</span>
+                                    <span className="text-slate-700 font-medium">{formatPrice(room.pricePerDay)}/day</span>
                                 </div>
 
                                 <Dialog
@@ -355,7 +353,7 @@ export function RoomBookingSection() {
                                 >
                                     <DialogTrigger asChild>
                                         <Button
-                                            className="w-full bg-blue-600 hover:bg-blue-500 text-white mt-auto disabled:opacity-50 disabled:cursor-not-allowed"
+                                            className="w-full bg-blue-600 hover:bg-blue-700 text-white mt-auto disabled:opacity-50 disabled:cursor-not-allowed"
                                             disabled={room.isOccupied}
                                         >
                                             {room.isOccupied
