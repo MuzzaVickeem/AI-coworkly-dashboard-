@@ -21,16 +21,14 @@ export function PublicHeader() {
                 <span className="font-semibold text-slate-900 text-lg">CoWork Ops</span>
             </div>
 
-            {/* Right - Login Button */}
-            {!isLoggedIn && (
-                <Button
-                    onClick={handleLogin}
-                    className=""
-                >
-                    <IconLogin size={18} className="mr-2" />
-                    Login
-                </Button>
-            )}
+            {/* Right - Login Button - Always show on public pages */}
+            <Button
+                onClick={handleLogin}
+                className=""
+            >
+                <IconLogin size={18} className="mr-2" />
+                {isLoggedIn ? 'Dashboard' : 'Login'}
+            </Button>
         </header>
     );
 }

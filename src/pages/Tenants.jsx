@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useAuth } from '@/context/AuthContext';
 import { motion } from 'framer-motion';
 import {
     IconBuilding,
@@ -29,6 +30,7 @@ import { useNavigate } from 'react-router-dom';
 const formatPrice = (amount) => `₹${amount.toLocaleString('en-IN')}`;
 
 export function Tenants() {
+    const { isDirector } = useAuth();
     const navigate = useNavigate();
     const { selectedLocation, selectedLocationId } = useLocation();
     const { getUniqueVendorsByLocation } = useBooking();
@@ -168,13 +170,15 @@ export function Tenants() {
                                     Tenants are added automatically when you complete a room booking.
                                     Book a room in the Seats page to add your first tenant.
                                 </p>
-                                <Button
-                                    onClick={handleGoToSeats}
-                                    className=""
-                                >
-                                    <IconPlus size={18} className="mr-2" />
-                                    Book a Room
-                                </Button>
+                                {!isDirector && (
+                                    <Button
+                                        onClick={handleGoToSeats}
+                                        className=""
+                                    >
+                                        <IconPlus size={18} className="mr-2" />
+                                        Book a Room
+                                    </Button>
+                                )}
                             </div>
                         ) : filteredVendors.length === 0 ? (
                             /* No search results */

@@ -75,7 +75,7 @@ export function CompanySelection() {
                         <h1 className="text-3xl font-bold text-slate-900 mb-2 tracking-tight">Select a Company</h1>
                         <p className="text-slate-500">Choose a company to view its dashboard</p>
                     </div>
-                    <div className="flex items-center gap-3">
+                    {/* <div className="flex items-center gap-3">
                         <Button
                             variant="outline"
                             onClick={handleLogout}
@@ -84,7 +84,7 @@ export function CompanySelection() {
                             <IconLogout size={18} className="mr-2" />
                             Logout
                         </Button>
-                    </div>
+                    </div> */}
                 </motion.div>
 
                 {/* Company Cards Grid */}

@@ -18,6 +18,7 @@ import { useBooking } from '@/context/BookingContext';
 import { useLocation } from '@/context/LocationContext';
 import { IconCheck } from '@tabler/icons-react';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/context/AuthContext';
 
 // Room images - Professional coworking space images
 const roomImages = {
@@ -46,12 +47,14 @@ const formatDateShort = (dateStr) => {
 };
 
 function BookingDialog({ room, onClose, onProceedToTenant }) {
+    const { isDirector } = useAuth();
     const today = new Date().toISOString().split('T')[0];
     const [startDate, setStartDate] = useState(today);
     const [endDate, setEndDate] = useState(today);
     const [selectedSeats, setSelectedSeats] = useState([]);
 
     const handleSeatToggle = (seatIndex) => {
+        if (isDirector) return; // Prevent seat selection in View Only mode
         setSelectedSeats(prev =>
             prev.includes(seatIndex)
                 ? prev.filter(s => s !== seatIndex)
@@ -133,7 +136,8 @@ function BookingDialog({ room, onClose, onProceedToTenant }) {
                                 value={startDate}
                                 onChange={(e) => setStartDate(e.target.value)}
                                 min={today}
-                                className="w-full h-12 bg-white border border-slate-300 rounded-lg px-4 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                disabled={isDirector}
+                                className="w-full h-12 bg-white border border-slate-300 rounded-lg px-4 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-60 disabled:bg-slate-50"
                             />
                         </div>
                         <div>
@@ -143,7 +147,8 @@ function BookingDialog({ room, onClose, onProceedToTenant }) {
                                 value={endDate}
                                 onChange={(e) => setEndDate(e.target.value)}
                                 min={startDate}
-                                className="w-full h-12 bg-white border border-slate-300 rounded-lg px-4 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                disabled={isDirector}
+                                className="w-full h-12 bg-white border border-slate-300 rounded-lg px-4 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-60 disabled:bg-slate-50"
                             />
                         </div>
                     </div>
@@ -198,16 +203,19 @@ function BookingDialog({ room, onClose, onProceedToTenant }) {
                             variant="outline"
                             className="h-12 px-8 border-slate-300 text-slate-600 hover:bg-slate-50 hover:text-slate-900"
                             onClick={onClose}
+                            showInViewOnly={true}
                         >
-                            Cancel
+                            {isDirector ? 'Close' : 'Cancel'}
                         </Button>
-                        <Button
-                            className="h-12 px-8 font-semibold"
-                            disabled={!canProceed}
-                            onClick={handleProceed}
-                        >
-                            Proceed to Assign Tenant
-                        </Button>
+                        {!isDirector && (
+                            <Button
+                                className="h-12 px-8 font-semibold"
+                                disabled={!canProceed}
+                                onClick={handleProceed}
+                            >
+                                Proceed to Assign Tenant
+                            </Button>
+                        )}
                     </div>
                 </div>
             </div>
@@ -231,6 +239,7 @@ function SuccessToast({ message }) {
 }
 
 export function RoomBookingSection() {
+    const { isDirector } = useAuth();
     const { selectedLocationId, selectedLocation } = useLocation();
     const { getRoomsByLocation, successMessage, lastBookedRoomId, bookRoom } = useBooking();
     const rooms = getRoomsByLocation(selectedLocationId);
@@ -353,14 +362,17 @@ export function RoomBookingSection() {
                                 >
                                     <DialogTrigger asChild>
                                         <Button
-                                            className="w-full mt-auto disabled:opacity-50 disabled:cursor-not-allowed"
-                                            disabled={room.isOccupied}
+                                            className="w-full mt-auto disabled:opacity-50 disabled:cursor-not-allowed text-xs py-2 px-3 h-auto"
+                                            disabled={room.isOccupied && !isDirector}
+                                            showInViewOnly={true}
                                         >
                                             {room.isOccupied
                                                 ? 'Occupied'
-                                                : room.allowSeatSelection
-                                                    ? 'Select Seats'
-                                                    : 'Book Room'
+                                                : isDirector
+                                                    ? 'View Details'
+                                                    : room.allowSeatSelection
+                                                        ? 'Select Seats'
+                                                        : 'Book Room'
                                             }
                                         </Button>
                                     </DialogTrigger>

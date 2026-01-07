@@ -8,12 +8,18 @@ import {
     IconShieldCheck,
     IconEye,
 } from '@tabler/icons-react';
+import { toast } from 'sonner';
 import { useAuth, ROLES } from '@/context/AuthContext';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import loginBg from '@/assets/login_bg.png';
+import { Toaster } from 'sonner';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+
+
+
 
 export function Login() {
     const navigate = useNavigate();
@@ -30,17 +36,38 @@ export function Login() {
         // Mock authentication delay
         await new Promise((resolve) => setTimeout(resolve, 800));
 
-        // Login with role based on selected tab
-        const role = loginType === 'admin' ? ROLES.ADMIN : ROLES.DIRECTOR;
-        login(email, role);
-        navigate('/companies');
+        // Validation based on role
+        const isAdmin = loginType === 'admin';
+        const validEmail = isAdmin ? 'admin@cowork.com' : 'director@cowork.com';
+        const validPassword = isAdmin ? 'admin123' : 'director123';
+
+        if (email === validEmail && password === validPassword) {
+            const role = isAdmin ? ROLES.ADMIN : ROLES.DIRECTOR;
+            login(email, role);
+            toast.success(`Success! Welcome back, ${isAdmin ? 'Admin' : 'Director'}.`, {
+                description: "You've been successfully authenticated."
+            });
+            navigate('/companies');
+        } else {
+            toast.error("Authentication Failed", {
+                description: `Invalid email or password for the ${isAdmin ? 'Admin' : 'Director'} role.`
+            });
+        }
+
         setIsLoading(false);
     };
 
     return (
-        <div className="min-h-screen bg-[#FAFAFA] flex items-center justify-center p-4">
-            {/* Subtle background */}
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-[#FAFAFA] to-slate-100" />
+        <div className="min-h-screen bg-slate-900 flex items-center justify-center p-4 relative overflow-hidden">
+            {/* High-quality modern background */}
+            <div className="absolute inset-0 z-0">
+                <img
+                    src={loginBg}
+                    alt="Background"
+                    className="w-full h-full object-cover opacity-60"
+                />
+                <div className="absolute inset-0 bg-gradient-to-br from-slate-900/60 via-slate-900/40 to-slate-900/60" />
+            </div>
 
             <motion.div
                 initial={{ opacity: 0, scale: 0.9, y: 20 }}
@@ -73,14 +100,14 @@ export function Login() {
                             <TabsList className="grid w-full grid-cols-2 bg-slate-100">
                                 <TabsTrigger
                                     value="admin"
-                                    className="data-[state=active]:bg-primary data-[state=active]:text-white text-slate-600 flex items-center gap-2 rounded-lg transition-all"
+                                    className="data-[state=active]:!bg-gradient-to-br data-[state=active]:from-blue-600 data-[state=active]:to-cyan-500 data-[state=active]:text-white text-slate-600 flex items-center gap-2 rounded-lg transition-all shadow-md data-[state=active]:shadow-blue-500/25"
                                 >
                                     <IconShieldCheck size={16} />
                                     Admin
                                 </TabsTrigger>
                                 <TabsTrigger
                                     value="director"
-                                    className="data-[state=active]:bg-primary data-[state=active]:text-white text-slate-600 flex items-center gap-2 rounded-lg transition-all"
+                                    className="data-[state=active]:!bg-gradient-to-br data-[state=active]:from-violet-600 data-[state=active]:to-fuchsia-500 data-[state=active]:text-white text-slate-600 flex items-center gap-2 rounded-lg transition-all shadow-md data-[state=active]:shadow-violet-500/25"
                                 >
                                     <IconEye size={16} />
                                     Director
@@ -196,15 +223,6 @@ export function Login() {
                                     </motion.span>
                                 </Button>
                             </motion.div>
-
-                            <motion.p
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                transition={{ delay: 0.6 }}
-                                className="text-center text-xs text-slate-400 pt-2"
-                            >
-                                Demo mode — any email/password works
-                            </motion.p>
                         </form>
                     </CardContent>
                 </Card>

@@ -32,7 +32,7 @@ export function AuthProvider({ children }) {
 
     useEffect(() => {
         localStorage.setItem('currentRole', currentRole);
-    }, [currentRole]);
+    }, [currentRole])
 
     useEffect(() => {
         if (selectedCompanyId) {

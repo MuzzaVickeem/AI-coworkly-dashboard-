@@ -9,7 +9,7 @@ import {
 
 export function Header() {
     const navigate = useNavigate();
-    const { logout } = useAuth();
+    const { logout, isDirector } = useAuth();
     const { selectedLocation } = useLocation();
 
     const handleLogout = () => {
@@ -36,11 +36,20 @@ export function Header() {
                 </div>
             </div>
 
-            {/* Right - Logout */}
+            {/* Right - View Only Indicator / Logout */}
             <div className="flex items-center gap-4">
+                {isDirector && (
+                    <div className="px-3 py-1 rounded-full bg-amber-50 border border-amber-200 flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                        <span className="text-xs font-medium text-amber-700 uppercase tracking-wider">
+                            View Only Access
+                        </span>
+                    </div>
+                )}
                 <Button
                     variant="ghost"
                     size="sm"
+                    showInViewOnly={true}
                     onClick={handleLogout}
                     className=""
                 >

@@ -6,7 +6,11 @@ export const buttonVariants = cva(
         variants: {
             variant: {
                 default:
-                    "bg-gradient-to-r from-[#FF0080] to-[#7928CA] text-white shadow-[0_4px_14px_0_rgba(121,40,202,0.39)] hover:shadow-[0_6px_20px_rgba(255,0,128,0.23)] border-none",
+                    "bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-[0_4px_14px_0_rgba(37,99,235,0.39)] hover:shadow-[0_6px_20px_rgba(37,99,235,0.23)] border-none",
+                admin:
+                    "bg-gradient-to-br from-blue-600 to-cyan-500 text-white shadow-lg shadow-blue-500/25 border-none",
+                director:
+                    "bg-gradient-to-br from-violet-600 to-fuchsia-500 text-white shadow-lg shadow-violet-500/25 border-none",
                 destructive:
                     "bg-destructive text-white shadow-sm hover:bg-destructive/90",
                 outline:

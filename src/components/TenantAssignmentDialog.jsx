@@ -18,6 +18,7 @@ import {
 } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useBooking } from '@/context/BookingContext';
+import { useAuth } from '@/context/AuthContext';
 import { IconArrowLeft, IconUpload, IconBuilding } from '@tabler/icons-react';
 
 const formatPrice = (amount) => `₹${amount.toLocaleString('en-IN')}`;
@@ -38,6 +39,7 @@ const formatDateDisplay = (dateStr) => {
  * - onConfirm: (tenantData) => void
  */
 export function TenantAssignmentDialog({ isOpen, onClose, onBack, bookingData, onConfirm }) {
+    const { isDirector } = useAuth();
     const { getUniqueVendors } = useBooking();
 
     // Get ALL existing vendors from completed bookings (not location-scoped for reuse)
@@ -141,13 +143,14 @@ export function TenantAssignmentDialog({ isOpen, onClose, onBack, bookingData, o
                             <TabsTrigger
                                 value="new"
                                 className="data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm text-slate-600"
+                                disabled={isDirector}
                             >
                                 New Tenant
                             </TabsTrigger>
                             <TabsTrigger
                                 value="existing"
                                 className="data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm text-slate-600"
-                                disabled={!hasExistingVendors}
+                                disabled={!hasExistingVendors || isDirector}
                             >
                                 Existing Tenant {!hasExistingVendors && '(None)'}
                             </TabsTrigger>
@@ -336,13 +339,15 @@ export function TenantAssignmentDialog({ isOpen, onClose, onBack, bookingData, o
                         >
                             ← Back
                         </Button>
-                        <Button
-                            className="h-11 px-8 font-semibold"
-                            disabled={!canConfirm}
-                            onClick={handleConfirm}
-                        >
-                            Confirm & Book
-                        </Button>
+                        {!isDirector && (
+                            <Button
+                                className="h-11 px-8 font-semibold"
+                                disabled={!canConfirm}
+                                onClick={handleConfirm}
+                            >
+                                Confirm & Book
+                            </Button>
+                        )}
                     </div>
                 </div>
             </DialogContent>

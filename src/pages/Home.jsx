@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { IconArrowRight, IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
 import { PublicHeader } from '@/components/layout/PublicHeader';
+import { BlurText } from '@/components/ui/BlurText';
+import officeHome from '@/assets/office_home.png';
 
 const galleryImages = [
     '/home/gallery-1.png',
@@ -45,85 +47,83 @@ export function Home() {
             <PublicHeader />
             <div className="space-y-0 bg-[#FAFAFA]">
                 {/* Hero Section - Editorial Layout */}
-                <section className="bg-[#FAFAFA]">
-                    {/* Text Section */}
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ duration: 0.8 }}
-                        className="relative bg-[#FAFAFA] py-20"
-                    >
-                        <div className="max-w-7xl mx-auto px-16">
-                            <div className="flex items-start justify-between">
-                                {/* Left - Heading */}
-                                <motion.h1
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ duration: 0.8, delay: 0.2 }}
-                                    className="text-7xl font-bold text-slate-900 leading-tight"
-                                >
-                                    COLLABORATE<br />
-                                    IN VIBRANT<br />
-                                    COWORKING
-                                </motion.h1>
+                <section className="bg-[#FAFAFA] pt-24 pb-12 overflow-hidden">
+                    <div className="max-w-7xl mx-auto px-16">
+                        <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] items-start gap-12 lg:gap-24">
+                            {/* Left - Large Editorial Heading */}
+                            <div>
+                                <h1 className="text-8xl font-bold text-slate-900 leading-[0.9] tracking-tight">
+                                    <BlurText
+                                        text={["COLLABORATE", "IN VIBRANT", "COWORKING"]}
+                                        delay={0.2}
+                                        wordDelay={0.5}
+                                    />
+                                </h1>
+                            </div>
 
-                                {/* Right - Description + CTA */}
+                            {/* Right - Description + CTA */}
+                            <div className="flex flex-col items-end pt-4">
+                                <motion.p
+                                    initial={{ opacity: 0, y: 15 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ duration: 1.0, delay: 2.2, ease: "easeOut" }}
+                                    className="text-slate-500 text-[15px] leading-relaxed text-right font-light"
+                                >
+                                    Our space is equipped with high-speed internet, printing and scanning facilities, meeting rooms, and a fully stocked kitchen. We also host a variety of events and workshops to help you grow your skills and network.
+                                </motion.p>
+
                                 <motion.div
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ duration: 0.8, delay: 0.4 }}
-                                    className="flex flex-col items-end gap-6 max-w-[280px]"
+                                    initial={{ opacity: 0, scale: 0.9 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    transition={{ duration: 0.8, delay: 2.8, ease: "easeOut" }}
+                                    className="mt-12"
                                 >
-                                    <p className="text-slate-600 text-sm leading-relaxed text-right">
-                                        Our space is equipped with high-speed internet, printing and scanning facilities, meeting rooms, and a fully stocked kitchenette. We also host a variety of events and workshops to help you grow your skills and network.
-                                    </p>
-
                                     <Link to="/dashboard/seats">
                                         <motion.div
                                             whileHover={{ scale: 1.05 }}
                                             whileTap={{ scale: 0.95 }}
-                                            className="relative w-28 h-28 rounded-full bg-blue-600 hover:bg-blue-700 flex items-center justify-center shadow-lg shadow-blue-600/30 transition-colors cursor-pointer"
+                                            className="relative w-32 h-32 rounded-full bg-blue-600 hover:bg-blue-700 flex items-center justify-center shadow-xl shadow-blue-600/20 transition-all cursor-pointer group"
                                         >
-                                            {/* Circular text */}
-                                            <svg className="absolute inset-0 w-full h-full animate-spin-slow" style={{ animationDuration: '20s' }}>
+                                            {/* Circular rotating text */}
+                                            <svg className="absolute inset-0 w-full h-full animate-spin-slow" style={{ animationDuration: '30s' }}>
                                                 <path
-                                                    id="circlePath"
-                                                    d="M 56,56 m -44,0 a 44,44 0 1,1 88,0 a 44,44 0 1,1 -88,0"
+                                                    id="circlePathHero"
+                                                    d="M 64,64 m -52,0 a 52,52 0 1,1 104,0 a 52,52 0 1,1 -104,0"
                                                     fill="none"
                                                 />
-                                                <text className="text-[10px] fill-white/70 tracking-wider">
-                                                    <textPath href="#circlePath" startOffset="0%">
+                                                <text className="text-[10px] fill-white/80 tracking-[0.15em] font-medium uppercase">
+                                                    <textPath href="#circlePathHero" startOffset="0%">
                                                         BOOK A SPACE • BOOK A SPACE •
                                                     </textPath>
                                                 </text>
                                             </svg>
 
-                                            {/* Arrow icon */}
-                                            <IconArrowRight size={26} className="text-white" />
+                                            {/* Minimal arrow icon */}
+                                            <IconArrowRight size={28} className="text-white relative z-10 group-hover:translate-x-1 transition-transform" />
                                         </motion.div>
                                     </Link>
                                 </motion.div>
                             </div>
                         </div>
-                    </motion.div>
+                    </div>
 
-                    {/* Image Card Section */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 30 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8, delay: 0.6 }}
-                        className="bg-[#FAFAFA] pb-20"
-                    >
-                        <div className="max-w-7xl mx-auto px-16">
-                            <div className="relative rounded-3xl overflow-hidden shadow-2xl">
-                                <img
-                                    src="/home/meeting-space.png"
-                                    alt="Coworking Space"
-                                    className="w-full h-[500px] object-cover"
-                                />
-                            </div>
-                        </div>
-                    </motion.div>
+                    {/* Image Reveal Section - After text animations */}
+                    <div className="max-w-7xl mx-auto px-16 mt-20">
+                        <motion.div
+                            initial={{ opacity: 0, y: 40 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 1.4, delay: 3.5, ease: [0.16, 1, 0.3, 1] }}
+                            className="relative rounded-[40px] overflow-hidden shadow-[0_32px_64px_-12px_rgba(0,0,0,0.1)] aspect-[21/9] bg-slate-100"
+                        >
+                            <img
+                                src={officeHome}
+                                alt="CoWorking Space"
+                                className="w-full h-full object-cover"
+                            />
+                            {/* Subtle overlay for depth */}
+                            <div className="absolute inset-0 bg-slate-900/10" />
+                        </motion.div>
+                    </div>
                 </section>
 
                 {/* About Us Section */}
@@ -132,26 +132,15 @@ export function Home() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.8 }}
-                    className="bg-white px-16 py-20 max-w-7xl mx-auto"
+                    className="bg-white px-16 py-8 max-w-7xl mx-auto"
                 >
-                    <div className="text-center mb-12">
-                        <motion.div
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            whileInView={{ opacity: 1, scale: 1 }}
-                            viewport={{ once: true }}
-                            className="inline-flex items-center gap-3 mb-8"
-                        >
-                            <div className="w-12 h-12 rounded-lg bg-blue-600 flex items-center justify-center shadow-sm">
-                                <IconArrowRight size={24} className="text-white" />
-                            </div>
-                        </motion.div>
-
+                    <div className="text-left mb-8">
                         <motion.p
                             initial={{ opacity: 0, y: 20 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ delay: 0.2 }}
-                            className="text-blue-600 text-sm font-semibold mb-4 tracking-wider"
+                            className="text-blue-600 text-lg font-semibold tracking-wider uppercase"
                         >
                             ABOUT US
                         </motion.p>
@@ -161,7 +150,7 @@ export function Home() {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ delay: 0.3 }}
-                            className="text-4xl font-bold text-slate-800 max-w-4xl mx-auto leading-relaxed"
+                            className="text-4xl font-bold text-slate-800 max-w-4xl leading-relaxed"
                         >
                             OUR COWORKING SPACE WAS FOUNDED ON THE BELIEF THAT WORKING TOGETHER IN A SUPPORTIVE COMMUNITY CAN LEAD TO GREATER SUCCESS AND FULFILLMENT.
                         </motion.h2>
@@ -174,7 +163,7 @@ export function Home() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.8 }}
-                    className="bg-[#FAFAFA] px-16 py-20 max-w-7xl mx-auto"
+                    className="bg-[#FAFAFA] px-16 py-8 max-w-7xl mx-auto"
                 >
                     <div className="mb-12">
                         <h2 className="text-5xl font-bold text-slate-900 mb-4">

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -36,8 +36,15 @@ const navItems = [
     },
 ];
 
-export function Sidebar() {
+export function Sidebar({ onWidthChange }) {
     const [isCollapsed, setIsCollapsed] = useState(false);
+
+    // Notify parent when width changes
+    useEffect(() => {
+        if (onWidthChange) {
+            onWidthChange(isCollapsed ? 72 : 256);
+        }
+    }, [isCollapsed, onWidthChange]);
 
     return (
         <motion.aside
@@ -46,30 +53,62 @@ export function Sidebar() {
             transition={{ duration: 0.3, ease: 'easeInOut' }}
             className="h-screen bg-white border-r border-slate-200 flex flex-col fixed left-0 top-0 z-40 shadow-sm"
         >
-            {/* Logo */}
+            {/* Logo and Collapse Toggle */}
             <div className="h-16 flex items-center justify-between px-4 border-b border-slate-100">
                 <AnimatePresence mode="wait">
-                    {!isCollapsed && (
+                    {!isCollapsed ? (
                         <motion.div
+                            key="expanded"
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
                             transition={{ duration: 0.2 }}
-                            className="flex items-center gap-3"
+                            className="flex items-center gap-3 overflow-hidden"
                         >
-                            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-md shadow-blue-500/25">
-                                <IconArmchair2 size={18} className="text-white" />
+                            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-md shadow-blue-500/25 flex-shrink-0">
+                                <IconArmchair2 size={16} className="text-white" />
                             </div>
                             <span className="font-semibold text-slate-900 whitespace-nowrap tracking-tight">CoWork Ops</span>
                         </motion.div>
+                    ) : (
+                        <motion.div
+                            key="collapsed"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="w-full flex justify-center"
+                        >
+                            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-md shadow-blue-500/25">
+                                <IconArmchair2 size={16} className="text-white" />
+                            </div>
+                        </motion.div>
                     )}
                 </AnimatePresence>
-                {isCollapsed && (
-                    <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center mx-auto shadow-md shadow-blue-500/25">
-                        <IconArmchair2 size={18} className="text-white" />
-                    </div>
+
+                {!isCollapsed && (
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setIsCollapsed(true)}
+                        className="h-8 w-8 p-0 text-slate-400 hover:text-slate-600 hover:bg-slate-50"
+                    >
+                        <IconChevronLeft size={18} />
+                    </Button>
                 )}
             </div>
+
+            {isCollapsed && (
+                <div className="flex justify-center py-2 border-b border-slate-50">
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setIsCollapsed(false)}
+                        className="h-8 w-8 p-0 text-slate-400 hover:text-slate-600 hover:bg-slate-50"
+                    >
+                        <IconChevronRight size={18} />
+                    </Button>
+                </div>
+            )}
 
             {/* Navigation */}
             <nav className="flex-1 py-6 px-3 space-y-1">
@@ -106,17 +145,6 @@ export function Sidebar() {
                 ))}
             </nav>
 
-            {/* Collapse toggle */}
-            <div className="p-3 border-t border-slate-100">
-                <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setIsCollapsed(!isCollapsed)}
-                    className="w-full justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-50"
-                >
-                    {isCollapsed ? <IconChevronRight size={18} /> : <IconChevronLeft size={18} />}
-                </Button>
-            </div>
         </motion.aside>
     );
 }

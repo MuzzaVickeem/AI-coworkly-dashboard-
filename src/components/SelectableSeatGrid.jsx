@@ -1,11 +1,13 @@
+import { motion } from 'framer-motion';
+import { useAuth } from '@/context/AuthContext';
 import { cn } from '@/lib/utils';
 import { IconArmchair2, IconCheck } from '@tabler/icons-react';
-import { Button } from '@/components/ui/button';
 
 /**
  * Selectable seat grid for booking dialog
  */
 export function SelectableSeatGrid({ capacity, selectedSeats = [], onSeatToggle, bookedSeats = [] }) {
+    const { isDirector } = useAuth();
     // Calculate grid dimensions - aim for roughly square layout
     const cols = capacity <= 4 ? 2 : capacity <= 6 ? 3 : capacity <= 9 ? 3 : capacity <= 12 ? 4 : 5;
 
@@ -26,25 +28,35 @@ export function SelectableSeatGrid({ capacity, selectedSeats = [], onSeatToggle,
                     const isSelected = isSeatSelected(index);
 
                     return (
-                        <Button
+                        <motion.button // Changed to motion.button
                             key={index}
-                            variant={isSelected ? "default" : "outline"}
-                            size="icon-sm"
-                            onClick={() => !isBooked && onSeatToggle(index)}
-                            disabled={isBooked}
+                            whileHover={!isBooked && !isDirector ? { scale: 1.1 } : {}} // Added isDirector condition
+                            whileTap={!isBooked && !isDirector ? { scale: 0.95 } : {}} // Added isDirector condition
+                            // variant={isSelected ? "default" : "outline"} // Removed variant prop
+                            // size="icon-sm" // Removed size prop
+                            onClick={() => !isBooked && !isDirector && onSeatToggle(index)} // Added isDirector condition
+                            disabled={isBooked || isDirector} // Added isDirector condition
                             className={cn(
-                                'w-10 h-10 rounded-lg',
-                                isBooked && 'opacity-50 grayscale',
-                                !isBooked && !isSelected && 'border-blue-100 bg-blue-50/30 text-blue-400 hover:border-blue-300 hover:bg-blue-100/50',
-                                isSelected && 'scale-[1.05] shadow-lg shadow-primary/20'
+                                'w-10 h-10 rounded-lg flex items-center justify-center text-xs font-semibold transition-all shadow-sm', // Modified base classes
+                                isBooked
+                                    ? "bg-slate-200 text-slate-400 cursor-not-allowed border-0" // Booked style
+                                    : isDirector // Director specific styles
+                                        ? isSelected
+                                            ? "bg-blue-600 text-white border-0 cursor-default"
+                                            : "bg-white text-slate-600 border border-slate-200 cursor-default shadow-none"
+                                        : isSelected // User specific styles
+                                            ? "bg-blue-600 text-white border-0 shadow-lg shadow-blue-200"
+                                            : "bg-white text-slate-600 border border-slate-200 hover:border-blue-400 hover:text-blue-600"
                             )}
                         >
+                            {/* Original icon logic, but now with seat number */}
                             {isSelected ? (
                                 <IconCheck size={18} strokeWidth={3} />
                             ) : (
-                                <IconArmchair2 size={18} />
+                                // <IconArmchair2 size={18} /> // Removed original icon
+                                index + 1 // Display seat number
                             )}
-                        </Button>
+                        </motion.button>
                     );
                 })}
             </div>

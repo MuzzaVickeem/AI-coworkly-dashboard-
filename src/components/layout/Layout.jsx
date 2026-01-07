@@ -10,10 +10,13 @@ export function Layout() {
 
     return (
         <div className="min-h-screen bg-[#FAFAFA]">
-            <Sidebar />
+            <Sidebar onWidthChange={setSidebarWidth} />
 
             {/* Main content area with left margin for sidebar */}
-            <div className="ml-[256px] transition-all duration-300" style={{ marginLeft: sidebarWidth }}>
+            <div
+                className="transition-all duration-300"
+                style={{ marginLeft: `${sidebarWidth}px` }}
+            >
                 <Header />
 
                 {/* Page content with animations */}

@@ -4,7 +4,7 @@ export const locations = [
         id: 'loc-a',
         name: 'Ideassion Technology',
         totalSeats: 65,
-        address: ' Hameed Complex, Anna Salai, Chennai, Tamil Nadu 600006',
+        address: ' Hameed Complex, Chennai, Tamil Nadu 600006',
     },
     {
         id: 'loc-b',
