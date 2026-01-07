@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import {
     Dialog,
     DialogContent,
@@ -17,9 +17,8 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useData } from '@/context/DataContext';
-import { useLocation } from '@/context/LocationContext';
-import { IconArrowLeft, IconUpload } from '@tabler/icons-react';
+import { useBooking } from '@/context/BookingContext';
+import { IconArrowLeft, IconUpload, IconBuilding } from '@tabler/icons-react';
 
 const formatPrice = (amount) => `₹${amount.toLocaleString('en-IN')}`;
 
@@ -39,13 +38,16 @@ const formatDateDisplay = (dateStr) => {
  * - onConfirm: (tenantData) => void
  */
 export function TenantAssignmentDialog({ isOpen, onClose, onBack, bookingData, onConfirm }) {
-    const { selectedLocationId } = useLocation();
-    const { getTenantsByLocation } = useData();
-    const existingTenants = getTenantsByLocation(selectedLocationId);
+    const { getUniqueVendors } = useBooking();
+
+    // Get ALL existing vendors from completed bookings (not location-scoped for reuse)
+    const existingVendors = getUniqueVendors;
+    const hasExistingVendors = existingVendors.length > 0;
+
     const fileInputRef = useRef(null);
 
     const [activeTab, setActiveTab] = useState('new');
-    const [selectedTenantId, setSelectedTenantId] = useState('');
+    const [selectedVendorId, setSelectedVendorId] = useState('');
     const [fileName, setFileName] = useState('');
 
     // Form state for new tenant
@@ -56,7 +58,10 @@ export function TenantAssignmentDialog({ isOpen, onClose, onBack, bookingData, o
         email: '',
     });
 
-    const selectedExistingTenant = existingTenants.find(t => t.id === selectedTenantId);
+    // Find selected vendor
+    const selectedVendor = useMemo(() => {
+        return existingVendors.find(v => v.companyId === selectedVendorId);
+    }, [existingVendors, selectedVendorId]);
 
     const handleFileChange = (e) => {
         const file = e.target.files?.[0];
@@ -67,6 +72,7 @@ export function TenantAssignmentDialog({ isOpen, onClose, onBack, bookingData, o
 
     const handleConfirm = () => {
         if (activeTab === 'new') {
+            // Create NEW vendor
             onConfirm({
                 type: 'new',
                 companyName: formData.companyName,
@@ -80,20 +86,24 @@ export function TenantAssignmentDialog({ isOpen, onClose, onBack, bookingData, o
                 agreementFile: fileName,
             });
         } else {
+            // Use EXISTING vendor - pass companyId to prevent duplication
             onConfirm({
                 type: 'existing',
-                tenantId: selectedTenantId,
-                tenantName: selectedExistingTenant?.name,
+                companyId: selectedVendor?.companyId,
+                companyName: selectedVendor?.companyName,
+                phone: selectedVendor?.contact?.phone,
+                email: selectedVendor?.contact?.email,
                 startDate: bookingData.startDate,
                 endDate: bookingData.endDate,
                 seatsBooked: bookingData.seats,
                 amount: bookingData.amount,
+                agreementFile: fileName,
             });
         }
     };
 
     const canConfirmNew = formData.companyName && formData.phone;
-    const canConfirmExisting = selectedTenantId;
+    const canConfirmExisting = selectedVendorId;
     const canConfirm = activeTab === 'new' ? canConfirmNew : canConfirmExisting;
 
     if (!bookingData) return null;
@@ -137,8 +147,9 @@ export function TenantAssignmentDialog({ isOpen, onClose, onBack, bookingData, o
                             <TabsTrigger
                                 value="existing"
                                 className="data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm text-slate-600"
+                                disabled={!hasExistingVendors}
                             >
-                                Existing Tenant
+                                Existing Tenant {!hasExistingVendors && '(None)'}
                             </TabsTrigger>
                         </TabsList>
 
@@ -239,47 +250,79 @@ export function TenantAssignmentDialog({ isOpen, onClose, onBack, bookingData, o
                             <div className="grid gap-4">
                                 <div className="grid gap-2">
                                     <Label className="text-slate-700">Select Company *</Label>
-                                    <Select value={selectedTenantId} onValueChange={setSelectedTenantId}>
+                                    <Select value={selectedVendorId} onValueChange={setSelectedVendorId}>
                                         <SelectTrigger className="bg-white border-slate-300 text-slate-900">
-                                            <SelectValue placeholder="Choose existing tenant" />
+                                            <SelectValue placeholder="Choose existing vendor" />
                                         </SelectTrigger>
                                         <SelectContent className="bg-white border-slate-200">
-                                            {existingTenants.map((tenant) => (
+                                            {existingVendors.map((vendor) => (
                                                 <SelectItem
-                                                    key={tenant.id}
-                                                    value={tenant.id}
+                                                    key={vendor.companyId}
+                                                    value={vendor.companyId}
                                                     className="text-slate-900"
                                                 >
-                                                    {tenant.name}
+                                                    <div className="flex items-center gap-2">
+                                                        <IconBuilding size={14} className="text-blue-600" />
+                                                        {vendor.companyName}
+                                                    </div>
                                                 </SelectItem>
                                             ))}
                                         </SelectContent>
                                     </Select>
                                 </div>
 
-                                {selectedExistingTenant && (
+                                {selectedVendor && (
                                     <div className="bg-slate-50 rounded-lg border border-slate-200 p-4 space-y-3">
-                                        <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Tenant Details (Read-Only)</h4>
+                                        <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider">Vendor Details (Auto-Populated)</h4>
                                         <div className="grid grid-cols-2 gap-3 text-sm">
                                             <div>
                                                 <span className="text-slate-400 text-xs">Company</span>
-                                                <p className="text-slate-900 font-medium">{selectedExistingTenant.name}</p>
+                                                <p className="text-slate-900 font-medium">{selectedVendor.companyName}</p>
+                                            </div>
+                                            <div>
+                                                <span className="text-slate-400 text-xs">Company ID</span>
+                                                <p className="text-blue-600 font-mono text-sm">{selectedVendor.companyId}</p>
                                             </div>
                                             <div>
                                                 <span className="text-slate-400 text-xs">Phone</span>
-                                                <p className="text-slate-900 font-medium">{selectedExistingTenant.contact?.phone}</p>
+                                                <p className="text-slate-900 font-medium">{selectedVendor.contact?.phone || '—'}</p>
                                             </div>
                                             <div>
                                                 <span className="text-slate-400 text-xs">Email</span>
-                                                <p className="text-slate-900 font-medium">{selectedExistingTenant.contact?.email}</p>
+                                                <p className="text-slate-900 font-medium">{selectedVendor.contact?.email || '—'}</p>
                                             </div>
                                             <div>
-                                                <span className="text-slate-400 text-xs">Status</span>
-                                                <p className="text-emerald-600 font-medium">{selectedExistingTenant.status}</p>
+                                                <span className="text-slate-400 text-xs">Previous Bookings</span>
+                                                <p className="text-emerald-600 font-semibold">{selectedVendor.totalBookings}</p>
+                                            </div>
+                                            <div>
+                                                <span className="text-slate-400 text-xs">Total Spent</span>
+                                                <p className="text-emerald-600 font-semibold">{formatPrice(selectedVendor.totalAmount)}</p>
                                             </div>
                                         </div>
                                     </div>
                                 )}
+
+                                {/* Optional: Agreement document for this booking */}
+                                <div className="grid gap-2">
+                                    <Label className="text-slate-700">Agreement Document (Optional)</Label>
+                                    <div
+                                        className="flex items-center gap-3 bg-white border border-slate-300 rounded-md px-3 py-2 cursor-pointer hover:border-blue-400 transition-colors"
+                                        onClick={() => fileInputRef.current?.click()}
+                                    >
+                                        <IconUpload size={18} className="text-slate-400" />
+                                        <span className="text-slate-600 text-sm flex-1">
+                                            {fileName || 'Click to upload file'}
+                                        </span>
+                                        <input
+                                            ref={fileInputRef}
+                                            type="file"
+                                            accept=".pdf,.jpg,.jpeg,.png,image/jpeg,image/png,application/pdf"
+                                            className="hidden"
+                                            onChange={handleFileChange}
+                                        />
+                                    </div>
+                                </div>
                             </div>
                         </TabsContent>
                     </Tabs>

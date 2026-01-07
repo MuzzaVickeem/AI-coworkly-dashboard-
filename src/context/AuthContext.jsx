@@ -1,21 +1,50 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
+import { ROLES } from './roles';
 
 const AuthContext = createContext(null);
 
-export const ROLES = {
-    ADMIN: 'Admin',
-    DIRECTOR: 'Director',
-};
+// Re-export ROLES for backward compatibility with existing imports
+export { ROLES };
 
 export function AuthProvider({ children }) {
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [currentRole, setCurrentRole] = useState(ROLES.ADMIN);
-    const [selectedCompanyId, setSelectedCompanyId] = useState(null);
-    const [adminEmail, setAdminEmail] = useState('');
+    // Initialize state from localStorage
+    const [isLoggedIn, setIsLoggedIn] = useState(() => {
+        return localStorage.getItem('isLoggedIn') === 'true';
+    });
+    const [currentRole, setCurrentRole] = useState(() => {
+        return localStorage.getItem('currentRole') || ROLES.ADMIN;
+    });
+    const [selectedCompanyId, setSelectedCompanyId] = useState(() => {
+        return localStorage.getItem('selectedCompanyId') || null;
+    });
+    const [adminEmail, setAdminEmail] = useState(() => {
+        return localStorage.getItem('adminEmail') || '';
+    });
     const [hasSeenIntro, setHasSeenIntro] = useState(() => {
         // Check sessionStorage on mount
         return sessionStorage.getItem('hasSeenIntro') === 'true';
     });
+
+    // Persist auth state to localStorage whenever it changes
+    useEffect(() => {
+        localStorage.setItem('isLoggedIn', isLoggedIn.toString());
+    }, [isLoggedIn]);
+
+    useEffect(() => {
+        localStorage.setItem('currentRole', currentRole);
+    }, [currentRole]);
+
+    useEffect(() => {
+        if (selectedCompanyId) {
+            localStorage.setItem('selectedCompanyId', selectedCompanyId);
+        } else {
+            localStorage.removeItem('selectedCompanyId');
+        }
+    }, [selectedCompanyId]);
+
+    useEffect(() => {
+        localStorage.setItem('adminEmail', adminEmail);
+    }, [adminEmail]);
 
     const isAdmin = currentRole === ROLES.ADMIN;
     const isDirector = currentRole === ROLES.DIRECTOR;
@@ -36,6 +65,11 @@ export function AuthProvider({ children }) {
         setIsLoggedIn(false);
         setSelectedCompanyId(null);
         setAdminEmail('');
+        // Clear localStorage
+        localStorage.removeItem('isLoggedIn');
+        localStorage.removeItem('currentRole');
+        localStorage.removeItem('selectedCompanyId');
+        localStorage.removeItem('adminEmail');
     };
 
     const selectCompany = (companyId) => {
