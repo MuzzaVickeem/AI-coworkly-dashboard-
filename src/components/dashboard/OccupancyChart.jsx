@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useData } from '@/context/DataContext';
 import { locations } from '@/data/locations';
+import { IconArmchair } from '@tabler/icons-react';
 
 export function OccupancyChart({ locationId }) {
     const { calculateLocationKPIs } = useData();
@@ -11,27 +12,32 @@ export function OccupancyChart({ locationId }) {
     const [key, setKey] = useState(0);
 
     useEffect(() => {
-        // If showing all locations
+        let chartData = [];
+        
         if (!locationId || locationId === 'all') {
-            const chartData = locations.map((loc) => {
+            // All locations view - show comparison
+            chartData = locations.flatMap((loc) => {
                 const kpis = calculateLocationKPIs(loc.id);
+                const locName = loc.name.split(' - ')[1] || loc.name;
                 return [
-                    { location: loc.name.split(' - ')[1] || loc.name, type: 'Occupied', seats: kpis?.occupiedSeats || 0 },
-                    { location: loc.name.split(' - ')[1] || loc.name, type: 'Vacant', seats: kpis?.vacantSeats || 0 },
+                    { location: locName, status: 'Occupied', seats: kpis?.occupiedSeats || 0 },
+                    { location: locName, status: 'Vacant', seats: kpis?.vacantSeats || 0 },
                 ];
-            }).flat();
-            setData(chartData);
+            });
         } else {
-            // Single location view
+            // Single location view - show stacked capacity
             const kpis = calculateLocationKPIs(locationId);
             const loc = locations.find(l => l.id === locationId);
-            const chartData = [
-                { location: 'Occupied', type: 'Occupied', seats: kpis?.occupiedSeats || 0 },
-                { location: 'Vacant', type: 'Vacant', seats: kpis?.vacantSeats || 0 },
+            const locName = loc ? (loc.name.split(' - ')[1] || loc.name) : 'Current Location';
+            
+            chartData = [
+                { location: locName, status: 'Occupied', seats: kpis?.occupiedSeats || 0 },
+                { location: locName, status: 'Vacant', seats: kpis?.vacantSeats || 0 },
             ];
-            setData(chartData);
         }
-        // Trigger re-render for animation
+        
+        setData(chartData);
+        // Trigger re-render to animate
         setKey(prev => prev + 1);
     }, [locationId, calculateLocationKPIs]);
 
@@ -39,61 +45,98 @@ export function OccupancyChart({ locationId }) {
         data,
         xField: 'location',
         yField: 'seats',
-        colorField: 'type',
-        group: true,
-        style: {
-            radiusTopLeft: 6,
-            radiusTopRight: 6,
+        colorField: 'status',
+        seriesField: 'status',
+        isStack: true,
+        stack: true,
+        scrollbar: false, // explicit disable
+        slider: false,    // explicit disable
+        
+        // Colors
+        color: ({ status }) => {
+            return status === 'Occupied' ? '#3b82f6' : '#f1f5f9';
         },
-        scale: {
-            color: {
-                range: ['#2563EB', '#94A3B8'],
+
+        // Axis
+        xAxis: {
+            label: null, // Hide x-axis labels to avoid "Current Location" repeated or visual clutter
+            line: null,
+            grid: null,
+        },
+        yAxis: {
+            label: null,
+            grid: {
+                line: {
+                    style: {
+                        stroke: '#f1f5f9',
+                        lineDash: [4, 4],
+                    },
+                },
             },
         },
-        axis: {
-            x: {
-                title: false,
-                labelFontSize: 12,
-                labelFill: '#64748B',
-                line: { style: { stroke: '#E2E8F0' } },
-            },
-            y: {
-                title: false,
-                labelFontSize: 12,
-                labelFill: '#64748B',
-                grid: { line: { style: { stroke: '#F1F5F9' } } },
-            },
-        },
+        
         legend: {
-            color: {
-                position: 'top-right',
-                itemLabelFill: '#64748B',
-                itemLabelFontSize: 12,
-            },
+            position: 'top-right',
+            marker: { symbol: 'circle' },
         },
+        
+        // Tooltip
+        tooltip: {
+            customContent: (title, items) => {
+                const total = items.reduce((acc, curr) => acc + (parseFloat(curr.value || curr.data?.seats) || 0), 0);
+                return (
+                    <div className="bg-white p-3 rounded-lg shadow-xl border border-slate-100 min-w-[150px]">
+                        <div className="text-sm font-semibold text-slate-700 mb-2">Capacity Details</div>
+                        {items?.map((item, index) => (
+                            <div key={index} className="flex items-center justify-between text-sm mb-1 last:mb-0">
+                                <div className="flex items-center gap-2">
+                                    <span 
+                                        className="w-2 h-2 rounded-full" 
+                                        style={{ backgroundColor: item.color }}
+                                    />
+                                    <span className="text-slate-500">{item.name}</span>
+                                </div>
+                                <span className="font-medium text-slate-900">{item.value}</span>
+                            </div>
+                        ))}
+                         <div className="mt-2 pt-2 border-t border-slate-100 flex justify-between items-center">
+                            <span className="text-xs text-slate-400">Total Seats</span>
+                            <span className="text-xs font-bold text-slate-700">{total}</span>
+                        </div>
+                    </div>
+                );
+            }
+        },
+        
+        // Styling
+        columnStyle: {
+            radius: [4, 4, 0, 0],
+        },
+        
         animate: {
-            enter: { type: 'growInY', duration: 600 },
+            enter: { type: 'scaleInY', duration: 800 },
         },
-        interaction: {
-            elementHighlight: true,
-        },
-        state: {
-            active: { style: { fill: '#3B82F6' } },
-        },
+        
+        theme: 'classic',
     };
 
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
+            transition={{ duration: 0.6, delay: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
+            className="h-full"
         >
-            <Card className="bg-white border-slate-200 shadow-sm">
+            <Card className="bg-white border-slate-200 shadow-sm hover:shadow-md transition-shadow duration-300 h-full">
                 <CardHeader className="pb-2">
-                    <CardTitle className="text-lg font-semibold text-slate-900">Seat Occupancy</CardTitle>
+                    <CardTitle className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+                        <IconArmchair className="w-5 h-5 text-slate-400" />
+                        Seat Occupancy
+                    </CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <div className="h-64">
+                    <div className="h-72 w-full">
+                         {/* Force full width to prevent pagination issues if container is small */}
                         <Column key={key} {...config} />
                     </div>
                 </CardContent>
