@@ -4,6 +4,7 @@ import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { LocationProvider } from '@/context/LocationContext';
 import { DataProvider } from '@/context/DataContext';
 import { BookingProvider } from '@/context/BookingContext';
+import { PricingProvider } from '@/context/PricingContext';
 import { Layout } from '@/components/layout/Layout';
 import { Login } from '@/pages/Login';
 import { CompanySelection } from '@/pages/CompanySelection';
@@ -12,6 +13,7 @@ import { Dashboard } from '@/pages/Dashboard';
 import { Tenants } from '@/pages/Tenants';
 import { Seats } from '@/pages/Seats';
 import { StaffAttendance } from '@/pages/StaffAttendance';
+import { PricingConfiguration } from '@/pages/PricingConfiguration';
 import './App.css';
 
 
@@ -25,6 +27,20 @@ function ProtectedRoute({ children, requireCompany = false }) {
 
   if (requireCompany && !selectedCompanyId) {
     return <Navigate to="/companies" replace />;
+  }
+
+  return children;
+}
+
+function AdminProtectedRoute({ children }) {
+  const { isLoggedIn, isAdmin } = useAuth();
+
+  if (!isLoggedIn) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (!isAdmin) {
+    return <Navigate to="/dashboard" replace />;
   }
 
   return children;
@@ -75,7 +91,9 @@ function AppRoutes() {
             <LocationProvider>
               <DataProvider>
                 <BookingProvider>
-                  <Layout />
+                  <PricingProvider>
+                    <Layout />
+                  </PricingProvider>
                 </BookingProvider>
               </DataProvider>
             </LocationProvider>
@@ -86,6 +104,14 @@ function AppRoutes() {
         <Route path="tenants" element={<Tenants />} />
         <Route path="seats" element={<Seats />} />
         <Route path="attendance" element={<StaffAttendance />} />
+        <Route
+          path="pricing"
+          element={
+            <AdminProtectedRoute>
+              <PricingConfiguration />
+            </AdminProtectedRoute>
+          }
+        />
       </Route>
 
       {/* Catch-all redirect */}

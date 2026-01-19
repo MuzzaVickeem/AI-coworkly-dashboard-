@@ -20,13 +20,40 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useBooking } from '@/context/BookingContext';
 import { useAuth } from '@/context/AuthContext';
 import { IconArrowLeft, IconUpload, IconBuilding } from '@tabler/icons-react';
+import { cn } from '@/lib/utils';
 
-const formatPrice = (amount) => `₹${amount.toLocaleString('en-IN')}`;
+const formatPrice = (amount) => `₹${amount?.toLocaleString('en-IN') || 0}`;
 
 const formatDateDisplay = (dateStr) => {
     if (!dateStr) return '—';
     const date = new Date(dateStr);
     return date.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+};
+
+const formatTimeDisplay = (time24) => {
+    if (!time24) return '—';
+    const [hour, min] = time24.split(':').map(Number);
+    const period = hour >= 12 ? 'PM' : 'AM';
+    const hour12 = hour > 12 ? hour - 12 : hour === 0 ? 12 : hour;
+    return `${hour12}:${min.toString().padStart(2, '0')} ${period}`;
+};
+
+const calculateDays = (startDate, endDate) => {
+    if (!startDate || !endDate) return 1;
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const diffTime = end - start;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+    return diffDays > 0 ? diffDays : 1;
+};
+
+const calculateHoursBetween = (startTime, endTime) => {
+    if (!startTime || !endTime) return 0;
+    const [startH, startM] = startTime.split(':').map(Number);
+    const [endH, endM] = endTime.split(':').map(Number);
+    const startMinutes = startH * 60 + startM;
+    const endMinutes = endH * 60 + endM;
+    return (endMinutes - startMinutes) / 60;
 };
 
 /**
@@ -165,16 +192,51 @@ export function TenantAssignmentDialog({ isOpen, onClose, onBack, bookingData, o
                                     <span className="text-slate-900 font-medium">{bookingData.roomName}</span>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="text-slate-500">Seats Booked</span>
-                                    <span className="text-slate-900 font-medium">{bookingData.seats}</span>
+                                    <span className="text-slate-500">Booking Type</span>
+                                    <span className={cn(
+                                        "font-medium px-2 py-0.5 rounded text-xs",
+                                        bookingData.bookingType === 'time-based'
+                                            ? "bg-blue-100 text-blue-700"
+                                            : "bg-emerald-100 text-emerald-700"
+                                    )}>
+                                        {bookingData.bookingType === 'time-based' ? 'Hourly' : 'Day-Based'}
+                                    </span>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="text-slate-500">Start Date</span>
-                                    <span className="text-slate-900 font-medium">{formatDateDisplay(bookingData.startDate)}</span>
+                                    <span className="text-slate-500">{bookingData.dates?.length > 1 ? 'Date Range' : 'Date'}</span>
+                                    <span className="text-slate-900 font-medium">
+                                        {bookingData.dates?.length > 1
+                                            ? `${formatDateDisplay(bookingData.startDate)} – ${formatDateDisplay(bookingData.endDate)}`
+                                            : formatDateDisplay(bookingData.startDate)
+                                        }
+                                    </span>
+                                </div>
+                                {bookingData.bookingType === 'time-based' && bookingData.startTime && (
+                                    <div className="flex justify-between">
+                                        <span className="text-slate-500">Time</span>
+                                        <span className="text-slate-900 font-medium">
+                                            {formatTimeDisplay(bookingData.startTime)} – {formatTimeDisplay(bookingData.endTime)}
+                                        </span>
+                                    </div>
+                                )}
+                                <div className="flex justify-between">
+                                    <span className="text-slate-500">
+                                        {bookingData.bookingType === 'time-based' ? 'Total Hours' : 'Total Days'}
+                                    </span>
+                                    <span className="text-slate-900 font-medium">
+                                        {bookingData.bookingType === 'time-based'
+                                            ? `${bookingData.totalHours || calculateHoursBetween(bookingData.startTime, bookingData.endTime)} hr${(bookingData.totalHours || 1) > 1 ? 's' : ''}`
+                                            : `${calculateDays(bookingData.startDate, bookingData.endDate)} day${calculateDays(bookingData.startDate, bookingData.endDate) > 1 ? 's' : ''}`
+                                        }
+                                    </span>
                                 </div>
                                 <div className="flex justify-between">
-                                    <span className="text-slate-500">End Date</span>
-                                    <span className="text-slate-900 font-medium">{formatDateDisplay(bookingData.endDate)}</span>
+                                    <span className="text-slate-500">Selected Seats</span>
+                                    <span className="text-slate-900 font-medium">
+                                        {bookingData.selectedSeats?.length > 0
+                                            ? bookingData.selectedSeats.map(s => s + 1).join(', ')
+                                            : bookingData.seats + ' seats (all)'}
+                                    </span>
                                 </div>
                                 <div className="flex justify-between col-span-2 pt-2 border-t border-slate-200 mt-2">
                                     <span className="text-slate-500 font-medium">Amount</span>

@@ -9,9 +9,11 @@ import {
     IconCalendarTime,
     IconChevronLeft,
     IconChevronRight,
+    IconCurrencyRupee,
 } from '@tabler/icons-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/context/AuthContext';
 
 const navItems = [
     {
@@ -34,10 +36,23 @@ const navItems = [
         icon: IconCalendarTime,
         path: '/dashboard/attendance',
     },
+    {
+        label: 'Pricing',
+        icon: IconCurrencyRupee,
+        path: '/dashboard/pricing',
+        adminOnly: true,
+    },
 ];
 
 export function Sidebar({ onWidthChange }) {
+    const { isAdmin } = useAuth();
     const [isCollapsed, setIsCollapsed] = useState(false);
+
+    // Filter nav items based on role
+    const visibleNavItems = navItems.filter(item => {
+        if (item.adminOnly && !isAdmin) return false;
+        return true;
+    });
 
     // Notify parent when width changes
     useEffect(() => {
@@ -112,7 +127,7 @@ export function Sidebar({ onWidthChange }) {
 
             {/* Navigation */}
             <nav className="flex-1 py-6 px-3 space-y-1">
-                {navItems.map((item) => (
+                {visibleNavItems.map((item) => (
                     <NavLink
                         key={item.path}
                         to={item.path}

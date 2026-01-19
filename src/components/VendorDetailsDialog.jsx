@@ -23,6 +23,7 @@ import {
     IconMapPin,
     IconArmchair2,
     IconClipboardList,
+    IconClock,
 } from '@tabler/icons-react';
 import { useBooking } from '@/context/BookingContext';
 
@@ -156,8 +157,21 @@ export function VendorDetailsDialog({ isOpen, onClose, vendor }) {
                                                     </div>
                                                 </div>
                                                 <div className="flex items-center gap-3">
+                                                    {/* Booking Type Badge */}
+                                                    <Badge
+                                                        className={
+                                                            booking.bookingType === 'time-based'
+                                                                ? 'bg-purple-50 text-purple-700 border border-purple-200'
+                                                                : 'bg-blue-50 text-blue-700 border border-blue-200'
+                                                        }
+                                                    >
+                                                        {booking.bookingType === 'time-based' ? '⏱ Hourly' : '📅 Day'}
+                                                    </Badge>
                                                     <span className="text-xs text-slate-400">
-                                                        {formatDate(booking.startDate)} → {formatDate(booking.endDate)}
+                                                        {booking.bookingType === 'time-based'
+                                                            ? `${booking.startTime} – ${booking.endTime}`
+                                                            : `${formatDate(booking.startDate)} → ${formatDate(booking.endDate)}`
+                                                        }
                                                     </span>
                                                     <Badge
                                                         className={
@@ -194,13 +208,38 @@ export function VendorDetailsDialog({ isOpen, onClose, vendor }) {
                                                             )}
                                                         </p>
                                                     </div>
-                                                </div>
-                                                <div className="space-y-3">
+                                                    {/* Booking Type & Duration */}
                                                     <div>
-                                                        <span className="text-xs text-slate-400">Booking Period</span>
+                                                        <span className="text-xs text-slate-400">Booking Type</span>
                                                         <p className="text-slate-900 flex items-center gap-1">
-                                                            <IconCalendar size={14} className="text-slate-400" />
-                                                            {formatDate(booking.startDate)} — {formatDate(booking.endDate)}
+                                                            {booking.bookingType === 'time-based' ? (
+                                                                <>
+                                                                    <IconClock size={14} className="text-purple-500" />
+                                                                    Hour-based
+                                                                </>
+                                                            ) : (
+                                                                <>
+                                                                    <IconCalendar size={14} className="text-blue-500" />
+                                                                    Day-based
+                                                                </>
+                                                            )}
+                                                        </p>
+                                                    </div>
+                                                    {/* Time/Duration */}
+                                                    <div>
+                                                        <span className="text-xs text-slate-400">
+                                                            {booking.bookingType === 'time-based' ? 'Time Slot' : 'Duration'}
+                                                        </span>
+                                                        <p className="text-slate-900 font-medium">
+                                                            {booking.bookingType === 'time-based'
+                                                                ? `${booking.startTime} – ${booking.endTime} (${booking.totalHours || 1}h)`
+                                                                : `${(() => {
+                                                                    const start = new Date(booking.startDate);
+                                                                    const end = new Date(booking.endDate);
+                                                                    const days = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
+                                                                    return `${days} day${days > 1 ? 's' : ''}`;
+                                                                })()}`
+                                                            }
                                                         </p>
                                                     </div>
                                                     <div>

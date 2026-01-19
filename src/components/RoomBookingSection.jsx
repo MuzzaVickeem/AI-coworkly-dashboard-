@@ -14,9 +14,11 @@ import {
 import { SeatGrid } from './SeatGrid';
 import { SelectableSeatGrid } from './SelectableSeatGrid';
 import { TenantAssignmentDialog } from './TenantAssignmentDialog';
+import { TimeSlotBookingDialog } from './TimeSlotBookingDialog';
 import { useBooking } from '@/context/BookingContext';
 import { useLocation } from '@/context/LocationContext';
-import { IconCheck } from '@tabler/icons-react';
+import { usePricing, SEAT_TYPE_MULTIPLIERS } from '@/context/PricingContext';
+import { IconCheck, IconClock, IconCalendarEvent, IconArmchair, IconStarFilled } from '@tabler/icons-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/context/AuthContext';
 
@@ -32,13 +34,29 @@ const roomImages = {
 
 const formatPrice = (amount) => `₹${amount.toLocaleString('en-IN')}`;
 
-const calculateDays = (startDate, endDate) => {
-    if (!startDate || !endDate) return 0;
+// Calculate working days (excluding Sundays)
+const calculateWorkingDays = (startDate, endDate) => {
+    if (!startDate || !endDate) return { totalDays: 0, workingDays: 0, excludedSundays: 0 };
     const start = new Date(startDate);
     const end = new Date(endDate);
+
+    let workingDays = 0;
+    let excludedSundays = 0;
+    const current = new Date(start);
+
+    while (current <= end) {
+        if (current.getDay() === 0) {
+            excludedSundays++;
+        } else {
+            workingDays++;
+        }
+        current.setDate(current.getDate() + 1);
+    }
+
     const diffTime = end - start;
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
-    return diffDays > 0 ? diffDays : 0;
+    const totalDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+
+    return { totalDays, workingDays, excludedSundays };
 };
 
 const formatDateShort = (dateStr) => {
@@ -46,12 +64,31 @@ const formatDateShort = (dateStr) => {
     return date.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
 };
 
-function BookingDialog({ room, onClose, onProceedToTenant }) {
+function BookingDialog({ room, onClose, onProceedToTenant, onSwitchToHourly, locationId }) {
     const { isDirector } = useAuth();
+    const { checkDayBookingConflict } = useBooking();
+    const { getPriceForBookingDate } = usePricing();
     const today = new Date().toISOString().split('T')[0];
     const [startDate, setStartDate] = useState(today);
     const [endDate, setEndDate] = useState(today);
     const [selectedSeats, setSelectedSeats] = useState([]);
+    const [dateError, setDateError] = useState('');
+
+    // Use dynamic pricing based on selected date
+    const currentPricing = getPriceForBookingDate(locationId, room.id, startDate);
+
+    // Explicit Pricing Selection
+    const dailyPrice = room.allowSeatSelection
+        ? currentPricing?.seatPricePerDay
+        : currentPricing?.roomPricePerDay;
+
+    const weeklyPrice = room.allowSeatSelection
+        ? currentPricing?.seatPricePerWeek
+        : currentPricing?.roomPricePerWeek;
+
+    const isConfigured = dailyPrice > 0;
+
+    const [needsEndDateSelection, setNeedsEndDateSelection] = useState(false);
 
     const handleSeatToggle = (seatIndex) => {
         if (isDirector) return; // Prevent seat selection in View Only mode
@@ -62,17 +99,71 @@ function BookingDialog({ room, onClose, onProceedToTenant }) {
         );
     };
 
-    const totalDays = useMemo(() => calculateDays(startDate, endDate), [startDate, endDate]);
+    // Validate dates when they change - auto-clear end date when start changes
+    const handleStartDateChange = (value) => {
+        setStartDate(value);
+        // Auto-clear end date when start date changes
+        setEndDate('');
+        setNeedsEndDateSelection(true);
+        setDateError('Please select an end date');
+    };
 
-    const totalPrice = useMemo(() => {
-        if (room.allowSeatSelection) {
-            const pricePerSeat = Math.round(room.pricePerDay / room.capacity);
-            return selectedSeats.length * pricePerSeat * totalDays;
+    const handleEndDateChange = (value) => {
+        // Check if end date is a Sunday
+        const selectedDate = new Date(value);
+        if (selectedDate.getDay() === 0) {
+            setDateError('Cannot select Sunday as end date');
+            return;
         }
-        return room.pricePerDay * totalDays;
-    }, [room, selectedSeats, totalDays]);
+        setEndDate(value);
+        setNeedsEndDateSelection(false);
+        setDateError('');
+    };
 
-    const canProceed = totalDays > 0 && (!room.allowSeatSelection || selectedSeats.length > 0);
+    // Calculate working days excluding Sundays
+    const { workingDays, excludedSundays } = useMemo(() =>
+        calculateWorkingDays(startDate, endDate),
+        [startDate, endDate]
+    );
+
+    // Check for booking conflicts (hourly bookings on selected dates)
+    const conflict = useMemo(() => {
+        if (!room?.id || !locationId) return { hasConflict: false, conflictDates: [], message: null };
+        return checkDayBookingConflict(room.id, startDate, endDate, locationId);
+    }, [room.id, startDate, endDate, locationId, checkDayBookingConflict]);
+
+    // PRICING RULES:
+    // 1. Day-based -> DailyPrice × Days
+    // 2. Week-based -> WeeklyPrice (For every 6 working days)
+    const pricingSummary = useMemo(() => {
+        if (!isConfigured) return { total: 0, type: 'N/A' };
+
+        const units = room.allowSeatSelection ? selectedSeats.length : 1;
+
+        // Logic: Use Weekly Price for every 6 working days, daily price for remainder
+        if (weeklyPrice > 0 && workingDays >= 6) {
+            const weeks = Math.floor(workingDays / 6);
+            const extraDays = workingDays % 6;
+            const total = (weeks * weeklyPrice + extraDays * dailyPrice) * units;
+            return {
+                total,
+                type: 'Week-based (Discount Applied)',
+                breakdown: `${weeks} week${weeks > 1 ? 's' : ''} @ ${formatPrice(weeklyPrice)} ${extraDays > 0 ? `+ ${extraDays} day${extraDays > 1 ? 's' : ''} @ ${formatPrice(dailyPrice)}` : ''}`
+            };
+        } else {
+            const total = (workingDays * dailyPrice) * units;
+            return {
+                total,
+                type: 'Day-based',
+                breakdown: `${workingDays} day${workingDays > 1 ? 's' : ''} @ ${formatPrice(dailyPrice)}`
+            };
+        }
+    }, [room, selectedSeats, workingDays, dailyPrice, weeklyPrice, isConfigured]);
+
+    const totalPrice = pricingSummary.total;
+
+    // Cannot proceed if there's a conflict, needs end date selection, or pricing not configured
+    const canProceed = isConfigured && workingDays > 0 && !conflict.hasConflict && !needsEndDateSelection && (!room.allowSeatSelection || selectedSeats.length > 0);
 
     const handleProceed = () => {
         // Pass booking data to tenant assignment
@@ -84,15 +175,17 @@ function BookingDialog({ room, onClose, onProceedToTenant }) {
             amount: totalPrice,
             startDate: startDate,
             endDate: endDate,
+            bookingType: pricingSummary.type.toLowerCase().includes('week') ? 'week-based' : 'day-based',
+            effectiveDateUsed: currentPricing?.appliedEffectiveDate,
         });
     };
 
     return (
         <DialogContent
-            className="bg-white border-slate-200 text-slate-900 p-0 overflow-hidden shadow-2xl"
+            className="bg-white border-slate-200 text-slate-900 p-0 overflow-hidden shadow-2xl max-h-[90vh] flex flex-col"
             style={{ maxWidth: '960px', width: '95vw' }}
         >
-            <DialogHeader className="px-8 pt-8 pb-6 border-b border-slate-100">
+            <DialogHeader className="px-8 pt-8 pb-6 border-b border-slate-100 flex-shrink-0">
                 <DialogTitle className="text-2xl font-bold text-slate-900">{room.name}</DialogTitle>
                 <DialogDescription className="text-slate-500 text-sm mt-1">
                     {room.allowSeatSelection
@@ -102,7 +195,7 @@ function BookingDialog({ room, onClose, onProceedToTenant }) {
                 </DialogDescription>
             </DialogHeader>
 
-            <div className="grid p-8" style={{ gridTemplateColumns: '1fr 1fr', gap: '48px' }}>
+            <div className="grid p-8 overflow-y-auto flex-1" style={{ gridTemplateColumns: '1fr 1fr', gap: '48px' }}>
                 {/* Left Column: Seat Grid */}
                 <div className="flex flex-col">
                     <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-5">
@@ -114,10 +207,14 @@ function BookingDialog({ room, onClose, onProceedToTenant }) {
                                 capacity={room.capacity}
                                 selectedSeats={selectedSeats}
                                 onSeatToggle={handleSeatToggle}
-                                bookedSeats={room.bookedSeats}
+                                bookedSeats={room.bookedSeats || []}
+                                seatsMetadata={room.seatsMetadata || []}
                             />
                         ) : (
-                            <SeatGrid capacity={room.capacity} />
+                            <SeatGrid
+                                capacity={room.capacity}
+                                seatsMetadata={room.seatsMetadata || []}
+                            />
                         )}
                     </div>
                 </div>
@@ -128,13 +225,13 @@ function BookingDialog({ room, onClose, onProceedToTenant }) {
                         Booking Period
                     </h4>
 
-                    <div className="grid mb-8" style={{ gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                    <div className="grid mb-4" style={{ gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                         <div>
                             <label className="block text-xs text-slate-500 mb-2 font-medium">Start Date</label>
                             <input
                                 type="date"
                                 value={startDate}
-                                onChange={(e) => setStartDate(e.target.value)}
+                                onChange={(e) => handleStartDateChange(e.target.value)}
                                 min={today}
                                 disabled={isDirector}
                                 className="w-full h-12 bg-white border border-slate-300 rounded-lg px-4 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-60 disabled:bg-slate-50"
@@ -145,7 +242,7 @@ function BookingDialog({ room, onClose, onProceedToTenant }) {
                             <input
                                 type="date"
                                 value={endDate}
-                                onChange={(e) => setEndDate(e.target.value)}
+                                onChange={(e) => handleEndDateChange(e.target.value)}
                                 min={startDate}
                                 disabled={isDirector}
                                 className="w-full h-12 bg-white border border-slate-300 rounded-lg px-4 text-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-60 disabled:bg-slate-50"
@@ -153,11 +250,72 @@ function BookingDialog({ room, onClose, onProceedToTenant }) {
                         </div>
                     </div>
 
+                    {/* Sunday Error */}
+                    {dateError && (
+                        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2">
+                            <span className="text-red-500 text-sm">⚠</span>
+                            <span className="text-sm text-red-700">{dateError}</span>
+                        </div>
+                    )}
+
+                    {/* Booking Conflict Alert */}
+                    {conflict.hasConflict && (
+                        <div className="mb-4 p-4 bg-amber-50 border border-amber-300 rounded-xl">
+                            <div className="flex items-start gap-3 mb-3">
+                                <span className="text-amber-600 text-lg">⚠️</span>
+                                <div>
+                                    <p className="text-sm font-semibold text-amber-800">
+                                        Partial bookings already exist
+                                    </p>
+                                    <p className="text-xs text-amber-700 mt-1">
+                                        {conflict.message}
+                                    </p>
+                                </div>
+                            </div>
+                            <div className="pl-7 space-y-2">
+                                <p className="text-xs font-medium text-amber-800 mb-2">Alternative options:</p>
+                                <div className="flex flex-wrap gap-2">
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className="text-xs border-amber-400 text-amber-700 hover:bg-amber-100"
+                                        onClick={() => {
+                                            onClose();
+                                            if (onSwitchToHourly) onSwitchToHourly(room);
+                                        }}
+                                    >
+                                        📅 Book available hours instead
+                                    </Button>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className="text-xs border-amber-400 text-amber-700 hover:bg-amber-100"
+                                        onClick={() => {
+                                            // Reset dates to allow selecting different dates
+                                            setStartDate(today);
+                                            setEndDate(today);
+                                        }}
+                                    >
+                                        🔄 Select different date
+                                    </Button>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className="text-xs border-amber-400 text-amber-700 hover:bg-amber-100"
+                                        onClick={onClose}
+                                    >
+                                        🏢 Select different room
+                                    </Button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
                     <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-5">
                         Booking Summary
                     </h4>
 
-                    <div className="bg-slate-50 rounded-xl border border-slate-200 p-5 flex-1">
+                    <div className="bg-slate-50 rounded-xl border border-slate-200 p-5 flex-1 space-y-4">
                         <table className="w-full">
                             <tbody className="text-sm">
                                 <tr>
@@ -178,7 +336,38 @@ function BookingDialog({ room, onClose, onProceedToTenant }) {
                                 <tr>
                                     <td className="py-2 text-slate-500">Duration</td>
                                     <td className="py-2 text-slate-900 text-right font-medium">
-                                        {totalDays > 0 ? `${totalDays} day${totalDays > 1 ? 's' : ''}` : '—'}
+                                        {workingDays > 0 ? (
+                                            <>
+                                                {workingDays} day{workingDays > 1 ? 's' : ''}
+                                                {excludedSundays > 0 && (
+                                                    <span className="text-orange-500 text-xs block">
+                                                        ({excludedSundays} Sunday{excludedSundays > 1 ? 's' : ''} excluded)
+                                                    </span>
+                                                )}
+                                            </>
+                                        ) : '—'}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td className="py-2 text-slate-500 font-bold uppercase text-[10px]">Price Type</td>
+                                    <td className="py-2 text-blue-700 text-right font-bold text-xs">
+                                        {pricingSummary.type}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td className="py-2 text-slate-500">Rate Used</td>
+                                    <td className="py-2 text-slate-900 text-right font-medium">
+                                        {isConfigured ? (
+                                            workingDays >= 6 && weeklyPrice > 0
+                                                ? `${formatPrice(weeklyPrice)} / week`
+                                                : `${formatPrice(dailyPrice)} / day`
+                                        ) : 'Not configured'}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td className="py-2 text-slate-500">Effective Date</td>
+                                    <td className="py-2 text-blue-600 text-right font-bold text-[10px] uppercase">
+                                        {currentPricing?.appliedEffectiveDate || 'Current'}
                                     </td>
                                 </tr>
                                 <tr>
@@ -190,11 +379,29 @@ function BookingDialog({ room, onClose, onProceedToTenant }) {
                             </tbody>
                         </table>
 
-                        <div className="border-t border-slate-200 mt-4 pt-4 flex justify-between items-center">
-                            <span className="text-sm text-slate-900 font-bold">Total Price</span>
-                            <span className="text-2xl font-bold text-emerald-600">
-                                {formatPrice(totalPrice)}
-                            </span>
+                        <div className="border-t border-slate-200 pt-4">
+                            <div className="flex justify-between items-center">
+                                <span className="text-sm text-slate-900 font-bold">Total Price</span>
+                                {room.allowSeatSelection && selectedSeats.length === 0 ? (
+                                    <span className="text-sm text-slate-400 italic">
+                                        Select seats to calculate amount
+                                    </span>
+                                ) : (
+                                    <span className="text-2xl font-bold text-emerald-600">
+                                        {formatPrice(totalPrice)}
+                                    </span>
+                                )}
+                            </div>
+
+                            {isConfigured && (room.allowSeatSelection ? selectedSeats.length > 0 : true) && workingDays > 0 && (
+                                <div className="mt-3 pt-3 border-t border-slate-100 flex items-center gap-2 text-[10px] text-slate-500 italic">
+                                    <span className="font-bold not-italic">Breakdown:</span>
+                                    {room.allowSeatSelection
+                                        ? `${selectedSeats.length} seat${selectedSeats.length !== 1 ? 's' : ''} × (${pricingSummary.breakdown}) = ${formatPrice(totalPrice)}`
+                                        : `(${pricingSummary.breakdown}) = ${formatPrice(totalPrice)}`
+                                    }
+                                </div>
+                            )}
                         </div>
                     </div>
 
@@ -218,8 +425,8 @@ function BookingDialog({ room, onClose, onProceedToTenant }) {
                         )}
                     </div>
                 </div>
-            </div>
-        </DialogContent>
+            </div >
+        </DialogContent >
     );
 }
 
@@ -241,11 +448,15 @@ function SuccessToast({ message }) {
 export function RoomBookingSection() {
     const { isDirector } = useAuth();
     const { selectedLocationId, selectedLocation } = useLocation();
-    const { getRoomsByLocation, successMessage, lastBookedRoomId, bookRoom } = useBooking();
+    const { getRoomsByLocation, successMessage, lastBookedRoomId, bookRoom, getBookedTimeSlots } = useBooking();
+    const { getRoomPricing } = usePricing();
     const rooms = getRoomsByLocation(selectedLocationId);
     const [openDialogId, setOpenDialogId] = useState(null);
     const [tenantDialogOpen, setTenantDialogOpen] = useState(false);
     const [pendingBooking, setPendingBooking] = useState(null);
+    const [timeSlotDialogOpen, setTimeSlotDialogOpen] = useState(false);
+    const [selectedRoomForTimeSlot, setSelectedRoomForTimeSlot] = useState(null);
+    const [seatSelectionDialogOpen, setSeatSelectionDialogOpen] = useState(false);
     const cardRefs = useRef({});
 
     // Scroll to booked room card
@@ -266,6 +477,57 @@ export function RoomBookingSection() {
         setTimeout(() => setTenantDialogOpen(true), 150); // Open tenant dialog
     };
 
+    // Time-slot booking handlers
+    const handleOpenTimeSlotBooking = (room) => {
+        setSelectedRoomForTimeSlot(room);
+        setTimeSlotDialogOpen(true);
+    };
+
+    const handleTimeSlotConfirm = (bookingData) => {
+        if (!selectedRoomForTimeSlot) return;
+
+        // For seat-based rooms (Bay 1/2), show seat selection screen first
+        if (selectedRoomForTimeSlot.allowSeatSelection) {
+            // Store time slot booking data and open seat selection dialog
+            setPendingBooking({
+                ...bookingData,
+                roomId: selectedRoomForTimeSlot.id,
+                roomName: selectedRoomForTimeSlot.name,
+                seats: selectedRoomForTimeSlot.capacity,
+                selectedSeats: [],
+                amount: bookingData.totalAmount,
+                startDate: bookingData.dates?.[0] || bookingData.date,
+                endDate: bookingData.dates?.[bookingData.dates.length - 1] || bookingData.date,
+                bookingType: 'time-based',
+                needsSeatSelection: true,
+            });
+            setTimeSlotDialogOpen(false);
+            // Open seat selection dialog
+            setTimeout(() => setSeatSelectionDialogOpen(true), 150);
+            return;
+        }
+
+        // For non-seat-based rooms, proceed directly to tenant assignment
+        setPendingBooking({
+            ...bookingData,
+            roomId: selectedRoomForTimeSlot.id,
+            roomName: selectedRoomForTimeSlot.name,
+            seats: selectedRoomForTimeSlot.capacity,
+            selectedSeats: [],
+            amount: bookingData.totalAmount,
+            startDate: bookingData.dates?.[0] || bookingData.date,
+            endDate: bookingData.dates?.[bookingData.dates.length - 1] || bookingData.date,
+            bookingType: 'time-based',
+        });
+        setTimeSlotDialogOpen(false);
+        setTimeout(() => setTenantDialogOpen(true), 150);
+    };
+
+    const handleTimeSlotClose = () => {
+        setTimeSlotDialogOpen(false);
+        setSelectedRoomForTimeSlot(null);
+    };
+
     const handleTenantConfirm = (tenantData) => {
         if (pendingBooking) {
             // Complete the booking with tenant assignment
@@ -273,26 +535,45 @@ export function RoomBookingSection() {
                 startDate: pendingBooking.startDate,
                 endDate: pendingBooking.endDate,
                 selectedSeats: pendingBooking.selectedSeats,
+                // Time-based booking fields
+                bookingType: pendingBooking.bookingType || 'day-based',
+                startTime: pendingBooking.startTime || null,
+                endTime: pendingBooking.endTime || null,
+                dates: pendingBooking.dates || null,
+                totalHours: pendingBooking.totalHours || null,
                 tenant: tenantData
             }, selectedLocationId);
         }
         setTenantDialogOpen(false);
         setPendingBooking(null);
+        setSelectedRoomForTimeSlot(null);
     };
 
     const handleTenantClose = () => {
         setTenantDialogOpen(false);
         setPendingBooking(null);
+        setSelectedRoomForTimeSlot(null);
     };
 
     const handleTenantBack = () => {
-        // Close tenant dialog and reopen booking dialog
+        // Close tenant dialog and reopen the appropriate booking dialog
         setTenantDialogOpen(false);
-        setTimeout(() => {
-            if (pendingBooking) {
-                setOpenDialogId(pendingBooking.roomId);
+
+        if (pendingBooking?.bookingType === 'time-based') {
+            // Return to time slot dialog with preserved room
+            const room = rooms.find(r => r.id === pendingBooking.roomId);
+            if (room) {
+                setSelectedRoomForTimeSlot(room);
+                setTimeout(() => setTimeSlotDialogOpen(true), 150);
             }
-        }, 150);
+        } else {
+            // Return to day-based booking dialog
+            setTimeout(() => {
+                if (pendingBooking) {
+                    setOpenDialogId(pendingBooking.roomId);
+                }
+            }, 150);
+        }
     };
 
     return (
@@ -310,6 +591,159 @@ export function RoomBookingSection() {
                 onConfirm={handleTenantConfirm}
             />
 
+            {/* Time Slot Booking Dialog */}
+            {selectedRoomForTimeSlot && (
+                <TimeSlotBookingDialog
+                    isOpen={timeSlotDialogOpen}
+                    onClose={handleTimeSlotClose}
+                    room={selectedRoomForTimeSlot}
+                    locationId={selectedLocationId}
+                    bookedSlots={getBookedTimeSlots(selectedRoomForTimeSlot.id, new Date().toISOString().split('T')[0], selectedLocationId)}
+                    onConfirm={handleTimeSlotConfirm}
+                />
+            )}
+
+            {/* Seat Selection Dialog for Time-Based Booking (Bay 1/2) */}
+            {seatSelectionDialogOpen && pendingBooking && selectedRoomForTimeSlot && (
+                <Dialog open={seatSelectionDialogOpen} onOpenChange={(open) => !open && setSeatSelectionDialogOpen(false)}>
+                    <DialogContent
+                        className="bg-white border-slate-200 text-slate-900 p-0 overflow-hidden shadow-2xl max-h-[90vh] flex flex-col"
+                        style={{ maxWidth: '720px', width: '95vw' }}
+                    >
+                        <DialogHeader className="px-6 pt-6 pb-4 border-b border-slate-100 flex-shrink-0 bg-slate-50">
+                            <DialogTitle className="text-xl font-bold text-slate-900">
+                                Select Seats — {selectedRoomForTimeSlot.name}
+                            </DialogTitle>
+                            <DialogDescription className="text-slate-500 text-sm">
+                                {formatDateShort(pendingBooking.startDate)} at {pendingBooking.startTime} – {pendingBooking.endTime}. Please select your seats.
+                            </DialogDescription>
+                        </DialogHeader>
+
+                        <div className="p-6 overflow-y-auto flex-1 space-y-6">
+                            {/* Seat Selection Grid */}
+                            <div>
+                                <h4 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Select Your Seats</h4>
+                                <div className="bg-slate-50 rounded-xl p-4 border border-slate-200">
+                                    <SelectableSeatGrid
+                                        capacity={selectedRoomForTimeSlot.capacity}
+                                        selectedSeats={pendingBooking.selectedSeats || []}
+                                        bookedSeats={selectedRoomForTimeSlot.bookedSeats || []}
+                                        seatsMetadata={selectedRoomForTimeSlot.seatsMetadata || []}
+                                        onSeatToggle={(seatIndex) => {
+                                            const current = pendingBooking.selectedSeats || [];
+                                            const updated = current.includes(seatIndex)
+                                                ? current.filter(s => s !== seatIndex)
+                                                : [...current, seatIndex];
+                                            setPendingBooking({ ...pendingBooking, selectedSeats: updated });
+                                        }}
+                                    />
+                                </div>
+                                <p className="text-xs text-slate-500 mt-2">
+                                    {(pendingBooking.selectedSeats || []).length} seat{(pendingBooking.selectedSeats || []).length !== 1 ? 's' : ''} selected
+                                </p>
+                            </div>
+
+                            {/* Updated Price */}
+                            <div className="bg-emerald-50 rounded-xl p-4 border border-emerald-100">
+                                {(() => {
+                                    // SEAT PRICING RULE: Respect Seat Type (Premium/Standard)
+                                    const metadataList = selectedRoomForTimeSlot.seatsMetadata || [];
+                                    const totalAmount = (pendingBooking.selectedSeats || []).reduce((sum, seatIndex) => {
+                                        const metadata = metadataList.find(m => m.id === seatIndex) || { type: 'Standard' };
+                                        const multiplier = metadata.type === 'Premium' ? SEAT_TYPE_MULTIPLIERS.PREMIUM : SEAT_TYPE_MULTIPLIERS.STANDARD;
+                                        return sum + (pendingBooking.pricePerHour * multiplier * pendingBooking.totalHours);
+                                    }, 0);
+
+                                    const premiumSelectedCount = (pendingBooking.selectedSeats || []).filter(idx => {
+                                        const m = metadataList.find(meta => meta.id === idx);
+                                        return m?.type === 'Premium';
+                                    }).length;
+
+                                    return (
+                                        <>
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-emerald-700 font-medium">Total Amount</span>
+                                                {(pendingBooking.selectedSeats?.length || 0) === 0 ? (
+                                                    <span className="text-sm text-slate-400 italic">
+                                                        Select seats to calculate amount
+                                                    </span>
+                                                ) : (
+                                                    <div className="text-right">
+                                                        <span className="text-2xl font-bold text-emerald-600">
+                                                            {formatPrice(totalAmount)}
+                                                        </span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                            {(pendingBooking.selectedSeats?.length || 0) > 0 && (
+                                                <div className="mt-3 pt-3 border-t border-emerald-100/50 flex flex-col gap-1">
+                                                    <p className="text-xs text-emerald-600 font-medium">
+                                                        {formatPrice(pendingBooking.pricePerHour)} per seat / hour
+                                                    </p>
+                                                    <p className="text-[10px] text-emerald-500 italic pb-1">
+                                                        <span className="font-bold not-italic text-emerald-700">Breakdown:</span>{" "}
+                                                        {pendingBooking.selectedSeats?.length} seat{pendingBooking.selectedSeats?.length > 1 ? 's' : ''} × {formatPrice(pendingBooking.pricePerHour)} × {pendingBooking.totalHours} hr{pendingBooking.totalHours > 1 ? 's' : ''}
+                                                    </p>
+                                                    <div className="flex flex-col gap-1.5 bg-emerald-100/50 p-2.5 rounded-lg border border-emerald-200">
+                                                        <p className="text-[10px] font-bold text-emerald-700 uppercase tracking-tight">
+                                                            Linear seat pricing applied {pendingBooking.dailyPrice > 0 && `(No cap at ${formatPrice(pendingBooking.dailyPrice)})`}
+                                                        </p>
+                                                        {premiumSelectedCount > 0 && (
+                                                            <p className="text-[9px] text-amber-600 font-bold flex items-center gap-1">
+                                                                <IconStarFilled size={10} />
+                                                                Includes {premiumSelectedCount} Premium seat(s) with 20% surcharge
+                                                            </p>
+                                                        )}
+                                                        <p className="text-[9px] text-blue-600 font-bold flex items-center gap-1">
+                                                            <IconCalendarEvent size={10} />
+                                                            Effective Date: {pendingBooking.effectiveDateUsed || 'Current'}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </>
+                                    );
+                                })()}
+                            </div>
+                        </div>
+
+                        <div className="flex justify-end gap-4 p-6 border-t border-slate-100 flex-shrink-0">
+                            <Button
+                                variant="outline"
+                                className="h-11 px-6"
+                                onClick={() => {
+                                    setSeatSelectionDialogOpen(false);
+                                    // Reopen time slot dialog
+                                    setTimeout(() => setTimeSlotDialogOpen(true), 150);
+                                }}
+                            >
+                                ← Go Back
+                            </Button>
+                            <Button
+                                className="h-11 px-6 font-semibold"
+                                disabled={(pendingBooking.selectedSeats?.length || 0) === 0}
+                                onClick={() => {
+                                    // Update pending booking with selected seats and proceed to tenant
+                                    // Respect Seat Type (Premium/Standard)
+                                    const metadataList = selectedRoomForTimeSlot.seatsMetadata || [];
+                                    const finalAmount = (pendingBooking.selectedSeats || []).reduce((sum, seatIndex) => {
+                                        const metadata = metadataList.find(m => m.id === seatIndex) || { type: 'Standard' };
+                                        const multiplier = metadata.type === 'Premium' ? SEAT_TYPE_MULTIPLIERS.PREMIUM : SEAT_TYPE_MULTIPLIERS.STANDARD;
+                                        return sum + (pendingBooking.pricePerHour * multiplier * pendingBooking.totalHours);
+                                    }, 0);
+
+                                    setPendingBooking({ ...pendingBooking, amount: finalAmount });
+                                    setSeatSelectionDialogOpen(false);
+                                    setTimeout(() => setTenantDialogOpen(true), 150);
+                                }}
+                            >
+                                Assign Tenant →
+                            </Button>
+                        </div>
+                    </DialogContent>
+                </Dialog>
+            )}
+
             <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -321,6 +755,7 @@ export function RoomBookingSection() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {rooms.map((room) => {
                     const isHighlighted = lastBookedRoomId === room.id;
+                    const roomPricing = getRoomPricing(selectedLocationId, room.id);
 
                     return (
                         <Card
@@ -350,43 +785,70 @@ export function RoomBookingSection() {
                                 <CardTitle className="text-lg font-semibold text-slate-900 text-left">{room.name}</CardTitle>
                             </CardHeader>
 
-                            <CardContent className="px-4 pb-4 flex flex-col gap-4 flex-1">
+                            <CardContent className="px-4 pb-4 flex flex-col gap-3 flex-1">
                                 <div className="flex items-center justify-between text-sm">
                                     <span className="text-slate-500">{room.capacity} seats</span>
-                                    <span className="text-slate-700 font-medium">{formatPrice(room.pricePerDay)}/day</span>
+                                    <div className="text-right">
+                                        <div className="text-slate-700 font-medium">
+                                            {roomPricing?.roomPricePerDay ? `${formatPrice(roomPricing.roomPricePerDay)}/day` : 'N/A'}
+                                        </div>
+                                        <div className="text-slate-400 text-[10px]">
+                                            {roomPricing?.roomPricePerHour ? `${formatPrice(roomPricing.roomPricePerHour)}/hr` : 'Hourly N/A'}
+                                        </div>
+                                    </div>
                                 </div>
 
-                                <Dialog
-                                    open={openDialogId === room.id}
-                                    onOpenChange={(open) => setOpenDialogId(open ? room.id : null)}
-                                >
-                                    <DialogTrigger asChild>
+                                {/* Booking Buttons */}
+                                <div className="flex gap-2 mt-auto">
+                                    {/* Day-based booking */}
+                                    <Dialog
+                                        open={openDialogId === room.id}
+                                        onOpenChange={(open) => setOpenDialogId(open ? room.id : null)}
+                                    >
+                                        <DialogTrigger asChild>
+                                            <Button
+                                                variant="outline"
+                                                className="flex-1 disabled:opacity-50 disabled:cursor-not-allowed text-xs py-2 px-3 h-auto"
+                                                disabled={room.isOccupied && !isDirector}
+                                                showInViewOnly={true}
+                                            >
+                                                <IconCalendarEvent size={14} className="mr-1" />
+                                                {room.isOccupied
+                                                    ? 'Full'
+                                                    : isDirector
+                                                        ? 'View'
+                                                        : 'Day'
+                                                }
+                                            </Button>
+                                        </DialogTrigger>
+                                        <BookingDialog
+                                            room={room}
+                                            onClose={() => setOpenDialogId(null)}
+                                            onProceedToTenant={handleProceedToTenant}
+                                            onSwitchToHourly={() => {
+                                                setOpenDialogId(null);
+                                                handleOpenTimeSlotBooking(room);
+                                            }}
+                                            locationId={selectedLocationId}
+                                        />
+                                    </Dialog>
+
+                                    {/* Time-based booking (hourly) */}
+                                    {!isDirector && !room.isOccupied && (
                                         <Button
-                                            className="w-full mt-auto disabled:opacity-50 disabled:cursor-not-allowed text-xs py-2 px-3 h-auto"
-                                            disabled={room.isOccupied && !isDirector}
-                                            showInViewOnly={true}
+                                            className="flex-1 text-xs py-2 px-3 h-auto"
+                                            onClick={() => handleOpenTimeSlotBooking(room)}
                                         >
-                                            {room.isOccupied
-                                                ? 'Occupied'
-                                                : isDirector
-                                                    ? 'View Details'
-                                                    : room.allowSeatSelection
-                                                        ? 'Select Seats'
-                                                        : 'Book Room'
-                                            }
+                                            <IconClock size={14} className="mr-1" />
+                                            Hourly
                                         </Button>
-                                    </DialogTrigger>
-                                    <BookingDialog
-                                        room={room}
-                                        onClose={() => setOpenDialogId(null)}
-                                        onProceedToTenant={handleProceedToTenant}
-                                    />
-                                </Dialog>
+                                    )}
+                                </div>
                             </CardContent>
                         </Card>
                     );
                 })}
             </div>
-        </section>
+        </section >
     );
 }

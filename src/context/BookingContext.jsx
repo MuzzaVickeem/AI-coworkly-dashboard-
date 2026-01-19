@@ -9,8 +9,60 @@ const initialRoomsByLocation = {
     'loc-a': [
         { id: 'mr-1', name: 'Production Room', capacity: 8, pricePerDay: 2500, allowSeatSelection: false, isOccupied: false, bookedSeats: [], booking: null },
         { id: 'mr-2', name: 'Conference Room', capacity: 8, pricePerDay: 3000, allowSeatSelection: false, isOccupied: false, bookedSeats: [], booking: null },
-        { id: 'mr-3', name: 'ITS Bay 1', capacity: 15, pricePerDay: 5000, allowSeatSelection: true, isOccupied: false, bookedSeats: [], booking: null },
-        { id: 'mr-4', name: 'ITS Bay 2', capacity: 15, pricePerDay: 5000, allowSeatSelection: true, isOccupied: false, bookedSeats: [], booking: null },
+        {
+            id: 'mr-3',
+            name: 'ITS Bay 1',
+            capacity: 15,
+            pricePerDay: 5000,
+            allowSeatSelection: true,
+            isOccupied: false,
+            bookedSeats: [],
+            booking: null,
+            seatsMetadata: [
+                { id: 0, type: 'Premium', labels: ['Window', 'Corner'] },
+                { id: 1, type: 'Premium', labels: ['Window'] },
+                { id: 2, type: 'Standard', labels: ['Window'] },
+                { id: 3, type: 'Standard', labels: [] },
+                { id: 4, type: 'Standard', labels: ['Near AC'] },
+                { id: 5, type: 'Premium', labels: ['Quiet Zone'] },
+                { id: 6, type: 'Standard', labels: [] },
+                { id: 7, type: 'Standard', labels: [] },
+                { id: 8, type: 'Standard', labels: ['Quiet Zone'] },
+                { id: 9, type: 'Standard', labels: [] },
+                { id: 10, type: 'Premium', labels: ['Premium View'] },
+                { id: 11, type: 'Standard', labels: [] },
+                { id: 12, type: 'Standard', labels: ['Near AC'] },
+                { id: 13, type: 'Standard', labels: [] },
+                { id: 14, type: 'Premium', labels: ['Quiet Zone', 'Corner'] }
+            ]
+        },
+        {
+            id: 'mr-4',
+            name: 'ITS Bay 2',
+            capacity: 15,
+            pricePerDay: 5000,
+            allowSeatSelection: true,
+            isOccupied: false,
+            bookedSeats: [],
+            booking: null,
+            seatsMetadata: [
+                { id: 0, type: 'Premium', labels: ['Window', 'Corner'] },
+                { id: 1, type: 'Premium', labels: ['Window'] },
+                { id: 2, type: 'Standard', labels: ['Window'] },
+                { id: 3, type: 'Standard', labels: [] },
+                { id: 4, type: 'Standard', labels: ['Near AC'] },
+                { id: 5, type: 'Premium', labels: ['Quiet Zone'] },
+                { id: 6, type: 'Standard', labels: [] },
+                { id: 7, type: 'Standard', labels: [] },
+                { id: 8, type: 'Standard', labels: ['Quiet Zone'] },
+                { id: 9, type: 'Standard', labels: [] },
+                { id: 10, type: 'Premium', labels: ['Premium View'] },
+                { id: 11, type: 'Standard', labels: [] },
+                { id: 12, type: 'Standard', labels: ['Near AC'] },
+                { id: 13, type: 'Standard', labels: [] },
+                { id: 14, type: 'Premium', labels: ['Quiet Zone', 'Corner'] }
+            ]
+        },
         { id: 'mr-5', name: 'Third Eye', capacity: 12, pricePerDay: 4000, allowSeatSelection: false, isOccupied: false, bookedSeats: [], booking: null },
         { id: 'mr-6', name: 'Manager Room', capacity: 5, pricePerDay: 1500, allowSeatSelection: false, isOccupied: false, bookedSeats: [], booking: null },
     ],
@@ -58,6 +110,12 @@ const isBookingActive = (startDate, endDate) => {
     const end = new Date(endDate);
     end.setHours(23, 59, 59, 999);
     return today >= start && today <= end;
+};
+
+// Helper to convert time string (HH:MM) to minutes for comparison
+const timeToMinutes = (time) => {
+    const [hours, minutes] = time.split(':').map(Number);
+    return hours * 60 + minutes;
 };
 
 export function BookingProvider({ children }) {
@@ -139,17 +197,28 @@ export function BookingProvider({ children }) {
                             } : null
                         };
                     } else {
-                        // Full room booking - mark as occupied
+                        // Full room booking - check if it's time-based
+                        // Time-based bookings should NOT mark room as fully occupied
+                        const hasTimeBasedBooking = roomActiveBookings.some(b => b.bookingType === 'time-based');
+                        const hasDayBasedBooking = roomActiveBookings.some(b => b.bookingType !== 'time-based');
+
+                        // Room is fully occupied only if there's a day-based booking
+                        const isFullyOccupied = hasDayBasedBooking;
+
                         const latestBooking = roomActiveBookings[0];
                         return {
                             ...room,
-                            isOccupied: true,
+                            isOccupied: isFullyOccupied,
+                            hasTimeSlotBookings: hasTimeBasedBooking, // New flag for UI to use
                             bookedSeats: [],
                             booking: {
                                 startDate: latestBooking.startDate,
                                 endDate: latestBooking.endDate,
-                                selectedSeats: []
-                            }
+                                selectedSeats: [],
+                                bookingType: latestBooking.bookingType
+                            },
+                            // Store all time slot bookings for reference
+                            timeSlotBookings: roomActiveBookings.filter(b => b.bookingType === 'time-based')
                         };
                     }
                 });
@@ -283,6 +352,12 @@ export function BookingProvider({ children }) {
                 selectedSeats: selectedSeats || [],
                 startDate,
                 endDate,
+                // Time-based booking fields
+                bookingType: bookingDetails.bookingType || 'day-based',
+                startTime: bookingDetails.startTime || null,
+                endTime: bookingDetails.endTime || null,
+                dates: bookingDetails.dates || null,
+                totalHours: bookingDetails.totalHours || null,
                 amount: tenant.amount || 0,
                 agreementFile: tenant.agreementFile || '',
                 status: 'Active',
@@ -400,6 +475,188 @@ export function BookingProvider({ children }) {
         recalculateRoomStates(updatedBookings);
     }, [checkAndUpdateBookingStatuses, recalculateRoomStates]);
 
+    // =====================================================
+    // TIME-BASED BOOKING FUNCTIONS
+    // =====================================================
+
+    // Get booked time slots for a specific room and date
+    const getBookedTimeSlots = useCallback((roomId, date, locationId) => {
+        return completedBookings
+            .filter(booking => {
+                // Check if booking is for this room
+                if (booking.roomId !== roomId) return false;
+                if (locationId && booking.locationId !== locationId) return false;
+                if (booking.status !== 'Active') return false;
+
+                // Check if booking has time slots (time-based booking)
+                if (!booking.startTime || !booking.endTime) return false;
+
+                // Check if date matches (for single day) or is in date range (for multi-day)
+                if (booking.dates) {
+                    return booking.dates.includes(date);
+                }
+                return booking.date === date;
+            })
+            .map(booking => ({
+                date: booking.date || date,
+                startTime: booking.startTime,
+                endTime: booking.endTime,
+                companyName: booking.companyName,
+            }));
+    }, [completedBookings]);
+
+    // =====================================================
+    // CONFLICT DETECTION FUNCTIONS
+    // =====================================================
+
+    // Check if room has ANY hourly bookings on a specific date
+    const hasHourlyBookingsOnDate = useCallback((roomId, date, locationId) => {
+        return completedBookings.some(booking => {
+            if (booking.roomId !== roomId) return false;
+            if (locationId && booking.locationId !== locationId) return false;
+            if (booking.status !== 'Active') return false;
+            if (booking.bookingType !== 'time-based') return false;
+
+            // Check if date matches
+            if (booking.dates) {
+                return booking.dates.includes(date);
+            }
+            return booking.date === date || booking.startDate === date;
+        });
+    }, [completedBookings]);
+
+    // Check if room has ANY day-based bookings on a specific date
+    const hasDayBookingsOnDate = useCallback((roomId, date, locationId) => {
+        return completedBookings.some(booking => {
+            if (booking.roomId !== roomId) return false;
+            if (locationId && booking.locationId !== locationId) return false;
+            if (booking.status !== 'Active') return false;
+            if (booking.bookingType === 'time-based') return false; // Day-based only
+
+            // Check if date is within booking range
+            const bookingStart = new Date(booking.startDate);
+            const bookingEnd = new Date(booking.endDate);
+            const checkDate = new Date(date);
+
+            return checkDate >= bookingStart && checkDate <= bookingEnd;
+        });
+    }, [completedBookings]);
+
+    // Check day-based booking conflict for date range
+    const checkDayBookingConflict = useCallback((roomId, startDate, endDate, locationId) => {
+        const conflictDates = [];
+        const current = new Date(startDate);
+        const end = new Date(endDate);
+
+        while (current <= end) {
+            const dateStr = current.toISOString().split('T')[0];
+
+            // Skip Sundays
+            if (current.getDay() !== 0) {
+                if (hasHourlyBookingsOnDate(roomId, dateStr, locationId)) {
+                    conflictDates.push(dateStr);
+                }
+            }
+            current.setDate(current.getDate() + 1);
+        }
+
+        return {
+            hasConflict: conflictDates.length > 0,
+            conflictDates,
+            message: conflictDates.length > 0
+                ? `Partial bookings already exist for this room on ${conflictDates.length} date(s). Full-day booking is not available.`
+                : null,
+        };
+    }, [hasHourlyBookingsOnDate]);
+    const isTimeSlotAvailable = useCallback((roomId, date, startTime, endTime, locationId) => {
+        const bookedSlots = getBookedTimeSlots(roomId, date, locationId);
+
+        const newStart = timeToMinutes(startTime);
+        const newEnd = timeToMinutes(endTime);
+
+        return !bookedSlots.some(slot => {
+            const slotStart = timeToMinutes(slot.startTime);
+            const slotEnd = timeToMinutes(slot.endTime);
+
+            // Check for overlap
+            return (newStart < slotEnd && newEnd > slotStart);
+        });
+    }, [getBookedTimeSlots]);
+
+    // Book room with time slots
+    const bookRoomWithTimeSlot = useCallback((roomId, bookingDetails, locationId) => {
+        const { date, dates, startTime, endTime, totalHours, totalAmount, pricePerHour, tenant } = bookingDetails;
+
+        // Validate time slot availability for all dates
+        const datesToBook = dates || [date];
+        for (const d of datesToBook) {
+            if (!isTimeSlotAvailable(roomId, d, startTime, endTime, locationId)) {
+                return { success: false, error: `Time slot not available on ${d}` };
+            }
+        }
+
+        const room = roomsByLocation[locationId]?.find(r => r.id === roomId);
+        const locationName = getLocationName(locationId);
+
+        // Determine company ID
+        const companyName = tenant?.companyName || tenant?.tenantName || 'Unknown Company';
+        let companyId;
+        let existingCompany = null;
+
+        if (tenant?.companyId) {
+            companyId = tenant.companyId;
+            existingCompany = completedBookings.find(b => b.companyId === tenant.companyId);
+        } else {
+            existingCompany = completedBookings.find(
+                b => b.companyName.toLowerCase() === companyName.toLowerCase()
+            );
+            companyId = existingCompany?.companyId || generateCompanyId(companyName);
+        }
+
+        const newBooking = {
+            id: `bkg-${Date.now()}`,
+            companyId,
+            companyName,
+            contact: {
+                phone: tenant?.phone || existingCompany?.contact?.phone || '',
+                email: tenant?.email || existingCompany?.contact?.email || '',
+            },
+            roomId,
+            roomName: room?.name || roomId,
+            locationId,
+            locationName,
+            // Time-based booking fields
+            date: dates ? dates[0] : date,
+            dates: dates || [date],
+            startTime,
+            endTime,
+            totalHours,
+            pricePerHour,
+            amount: totalAmount,
+            // Standard fields
+            seats: room?.capacity || 0,
+            selectedSeats: [],
+            startDate: dates ? dates[0] : date,
+            endDate: dates ? dates[dates.length - 1] : date,
+            agreementFile: tenant?.agreementFile || '',
+            status: 'Active',
+            createdAt: new Date().toISOString(),
+            bookingType: 'time-based',
+        };
+
+        setCompletedBookings(prev => [newBooking, ...prev]);
+
+        // Set last booked room for scroll/highlight
+        setLastBookedRoomId(roomId);
+        setTimeout(() => setLastBookedRoomId(null), 2500);
+
+        // Show success message
+        setSuccessMessage('Time-based booking completed successfully');
+        setTimeout(() => setSuccessMessage(null), 3000);
+
+        return { success: true, booking: newBooking };
+    }, [roomsByLocation, completedBookings, isTimeSlotAvailable]);
+
     // Clear success message
     const clearSuccessMessage = useCallback(() => {
         setSuccessMessage(null);
@@ -424,6 +681,14 @@ export function BookingProvider({ children }) {
             getUniqueVendorsByLocation,
             // Expiry handling
             refreshBookingStates,
+            // Time-based booking functions
+            getBookedTimeSlots,
+            isTimeSlotAvailable,
+            bookRoomWithTimeSlot,
+            // Conflict detection functions
+            hasHourlyBookingsOnDate,
+            hasDayBookingsOnDate,
+            checkDayBookingConflict,
         }}>
             {children}
         </BookingContext.Provider>
